@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="80px"
+	android:id="@+id/TimerLayout">
+
+	<ImageButton android:id="@+id/TimerImageButton"
+		android:layout_width="50px" android:layout_height="50px"
+		android:src="@drawable/button_down" />
+
+	<TextView android:id="@+id/TimerLabel"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/TimerImageButton" android:text="Static Text" />
+
+	<Button android:text="Start" android:id="@+id/ToggleTimerOnOff"
+		android:layout_below="@id/TimerLabel" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_alignParentRight="true"
+		android:layout_alignParentTop="true" />
+
+	<View android:id="@+id/PieAnimation" android:layout_toLeftOf="@id/ToggleTimerOnOff"
+		android:layout_width="50px" android:layout_height="50px"></View>
+
+	<TextView android:text="0 mins" android:id="@+id/Duration"
+		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"
+		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+
+
+	<ProgressBar android:id="@+id/ProgressBar01"
+	    style="?android:attr/progressBarStyleHorizontal"
+	    android:layout_marginTop="12px"
+        android:layout_width="200dip"
+        android:layout_height="wrap_content"
+        android:max="100"
+		android:layout_below="@id/Duration"
+		android:layout_toRightOf="@id/TimerImageButton" 
+		android:progress = "50"></ProgressBar>
+</RelativeLayout>

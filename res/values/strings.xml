@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string name="app_name">MindTimer</string>
+	<string name="no_timers">No Timers Created Yet</string>
+	<string name="menu_insert">Add new timer</string>
+
+</resources>
