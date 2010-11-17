@@ -5,4 +5,6 @@
 	<string name="no_timers">No Timers Created Yet</string>
 	<string name="menu_insert">Add new timer</string>
 
+<string name="one_shot_received">some time is up!</string>
+<string name="one_shot_scheduled">Scheduled timer</string>
 </resources>

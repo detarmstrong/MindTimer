@@ -13,26 +13,22 @@
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/TimerImageButton" android:text="Static Text" />
 
-	<Button android:text="Start" android:id="@+id/ToggleTimerOnOff"
+	<Button android:drawableBottom="@drawable/play" android:id="@+id/ToggleTimerOnOff"
 		android:layout_below="@id/TimerLabel" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:layout_alignParentRight="true"
-		android:layout_alignParentTop="true" />
+		android:layout_height="50px" android:layout_alignParentRight="true"
+		android:layout_alignParentTop="true">
 
-	<View android:id="@+id/PieAnimation" android:layout_toLeftOf="@id/ToggleTimerOnOff"
-		android:layout_width="50px" android:layout_height="50px"></View>
+	</Button>
 
 	<TextView android:text="0 mins" android:id="@+id/Duration"
 		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"
 		android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
 
-	<ProgressBar android:id="@+id/ProgressBar01"
-	    style="?android:attr/progressBarStyleHorizontal"
-	    android:layout_marginTop="12px"
-        android:layout_width="200dip"
-        android:layout_height="wrap_content"
-        android:max="100"
-		android:layout_below="@id/Duration"
-		android:layout_toRightOf="@id/TimerImageButton" 
-		android:progress = "50"></ProgressBar>
+<!--	<ProgressBar android:id="@+id/ProgressBar01"-->
+<!--		style="?android:attr/progressBarStyleHorizontal"-->
+<!--		android:layout_marginTop="12px" android:layout_width="200dip"-->
+<!--		android:layout_height="wrap_content" android:max="100"-->
+<!--		android:layout_below="@id/Duration" android:layout_toRightOf="@id/TimerImageButton"-->
+<!--		android:progress="50"></ProgressBar>-->
 </RelativeLayout>
