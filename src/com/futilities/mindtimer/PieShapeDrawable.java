@@ -19,8 +19,4 @@ public class PieShapeDrawable extends ShapeDrawable {
         this.getPaint().setColor(color);
         this.setBounds(x, y, x + width, y + height);
     }
-
-
-    
-    
 }

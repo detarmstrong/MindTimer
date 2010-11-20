@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="80px"
+	android:layout_width="fill_parent" android:layout_height="55px"
 	android:id="@+id/TimerLayout">
 
 	<ImageButton android:id="@+id/TimerImageButton"
@@ -13,12 +13,12 @@
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/TimerImageButton" android:text="Static Text" />
 
-	<Button android:drawableBottom="@drawable/play" android:id="@+id/ToggleTimerOnOff"
-		android:layout_below="@id/TimerLabel" android:layout_width="wrap_content"
-		android:layout_height="50px" android:layout_alignParentRight="true"
-		android:layout_alignParentTop="true">
-
-	</Button>
+	<ImageButton android:src="@drawable/slowpoke_play_button" 
+        android:id="@+id/ToggleTimerOnOff"
+        android:layout_width="50px" android:layout_height="50px"         
+		android:layout_below="@id/TimerLabel" 
+		android:layout_alignParentRight="true" android:layout_alignParentTop="true" 
+		android:background="#0000"/>
 
 	<TextView android:text="0 mins" android:id="@+id/Duration"
 		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"

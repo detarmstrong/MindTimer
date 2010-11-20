@@ -11,7 +11,7 @@ public class MindTimerService extends Service {
      * Use this tag to change logging level of the whole application
      * Is used is isLoggable(APPTAG, ... ) calls
      */
-    public static final String APPTAG = "AndTweet";
+    public static final String APPTAG = "MindTimer";
 
     private static final String packageName = MindTimerService.class.getPackage().getName();
 
