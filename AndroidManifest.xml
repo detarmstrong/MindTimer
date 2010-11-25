@@ -14,7 +14,8 @@
             </intent-filter>
         </activity>
 
-    </application>
+    <activity android:name="TimerEdit"></activity>
+</application>
 
 
 </manifest> 

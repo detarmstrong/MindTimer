@@ -7,4 +7,5 @@
 
 <string name="one_shot_received">some time is up!</string>
 <string name="one_shot_scheduled">Scheduled timer</string>
+<string name="edit_timer">Edit Timer</string>
 </resources>
