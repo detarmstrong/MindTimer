@@ -3,16 +3,13 @@ package com.futilities.mindtimer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.futilities.mindtimer.ToggleTimerClickListener.UpdateTimeTask;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Shader;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.ShapeDrawable.ShaderFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -161,7 +158,14 @@ public class ToggleTimerClickListener implements OnClickListener {
                 // get pie progress view and update it
                 ShapeDrawable drabble = new PieShapeDrawable(-90,
                         (Float) msg.obj, 0, 0, 50, 50, 0xff74AC23);
-                d.setBackgroundDrawable(drabble);
+                
+                LayerDrawable bg = (LayerDrawable) d.getBackground();
+                
+                int layerId = bg.getId(1);
+                
+                bg.setDrawableByLayerId(layerId, drabble);
+                
+                d.setBackgroundDrawable(bg);
             }
 
         }

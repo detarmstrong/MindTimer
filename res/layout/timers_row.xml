@@ -18,7 +18,7 @@
         android:layout_width="50px" android:layout_height="50px"         
 		android:layout_below="@id/TimerLabel" 
 		android:layout_alignParentRight="true" android:layout_alignParentTop="true" 
-		android:background="#0000"/>
+		android:background="@drawable/button_layer_drawable"/>
 
 	<TextView android:text="0 mins" android:id="@+id/Duration"
 		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"
