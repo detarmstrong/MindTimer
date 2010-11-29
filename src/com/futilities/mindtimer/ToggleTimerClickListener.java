@@ -32,7 +32,7 @@ public class ToggleTimerClickListener implements OnClickListener {
     private Context mCtx;
     private UpdateTimeTask mTimerTask;
     private int mTimerState;
-    private float mTimerSecondsElapsed; // seconds timer has been running for
+    private float mSecElapsed; // seconds timer has been running for
 
     public ToggleTimerClickListener(Context context, long id, int secDuration) {
         mCtx = context;
@@ -56,7 +56,7 @@ public class ToggleTimerClickListener implements OnClickListener {
                 return;
             }
 
-            mTimerSecondsElapsed += .5;
+            mSecElapsed += .5;
 
             long millis = SystemClock.elapsedRealtime() - mStartTimeMillis;
             int seconds = (int) (millis / 1000);
@@ -68,7 +68,7 @@ public class ToggleTimerClickListener implements OnClickListener {
                 this.cancel();
             }
 
-            float percentComplete = (float) mTimerSecondsElapsed / mSecDuration;
+            float percentComplete = (float) mSecElapsed / mSecDuration;
 
             float degrees = percentComplete * 360;
 
@@ -93,22 +93,26 @@ public class ToggleTimerClickListener implements OnClickListener {
             ImageView d = (ImageView) ((MindTimer) mCtx).getListView()
                     .findViewWithTag(mId);
             d.setImageResource(R.drawable.slowpoke_play_button);
-            
+
             mTimer.cancel();
 
-        } else if (mTimerState == TIMER_NOT_STARTED || mTimerState == TIMER_PAUSED) { // then commence
+        } else if (mTimerState == TIMER_NOT_STARTED
+                || mTimerState == TIMER_PAUSED) { // then commence
             mTimerState = TIMER_ACTIVE;
-            
-            if(mTimerState == TIMER_PAUSED){
+
+            if (mTimerState == TIMER_PAUSED) {
                 // recommence;
-                // alarm will now ding at now plus the duration minus the seconds elapsed 
-                mAlarmDingAt = SystemClock.elapsedRealtime();
-                
+                // alarm will now ding at now plus the duration minus the
+                // seconds elapsed
+                mAlarmDingAt = (long) (SystemClock.elapsedRealtime() + (mSecDuration - mSecElapsed));
+
+                // persist the sec elapsed of this timer - if the user pauses
+                // and exits out and returns the elapsed state should remain
+
+            } else {
+
             }
-            else{
-                
-            }
-            
+
             // When the alarm goes off, we want to broadcast an Intent to our
             // BroadcastReceiver. Here we make an Intent with an explicit class
             // name to have our own receiver (which has been published in
@@ -137,8 +141,7 @@ public class ToggleTimerClickListener implements OnClickListener {
             mToast = Toast.makeText(v.getContext(),
                     R.string.one_shot_scheduled, Toast.LENGTH_LONG);
             mToast.show();
-            
-            
+
         }
 
     }
@@ -157,14 +160,14 @@ public class ToggleTimerClickListener implements OnClickListener {
 
                 // get pie progress view and update it
                 ShapeDrawable drabble = new PieShapeDrawable(-90,
-                        (Float) msg.obj, 0, 0, 50, 50, 0xff74AC23);
-                
+                        (Float) msg.obj, 0, 0, 50, 50, 0x8074AC23);
+
                 LayerDrawable bg = (LayerDrawable) d.getBackground();
-                
+
                 int layerId = bg.getId(1);
-                
+
                 bg.setDrawableByLayerId(layerId, drabble);
-                
+
                 d.setBackgroundDrawable(bg);
             }
 

@@ -5,7 +5,20 @@
 	<string name="no_timers">No Timers Created Yet</string>
 	<string name="menu_insert">Add new timer</string>
 
-<string name="one_shot_received">some time is up!</string>
-<string name="one_shot_scheduled">Scheduled timer</string>
-<string name="edit_timer">Edit Timer</string>
+	<string name="one_shot_received">some time is up!</string>
+	<string name="one_shot_scheduled">Scheduled timer</string>
+	<string name="edit_timer">Edit Timer</string>
+	<string name="hour_prompt">Hr:</string>
+	<integer-array name="hours_array">
+	    <item>00</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
+        <item>07</item>
+        <item>08</item>
+        <item>09</item>
+    </integer-array>
 </resources>

@@ -25,7 +25,6 @@ public class MindTimer extends ListActivity {
     protected ImageButton mToggleBtn;
     protected ArrayList<ToggleTimerClickListener> mToggleTimerClickListenerArrayList = new ArrayList<ToggleTimerClickListener>();
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +55,7 @@ public class MindTimer extends ListActivity {
     protected void onResume() {
         super.onResume();
         
-        //TODO resume the 
+        //TODO resume the timers that were active when the intent went away
     }
 
     private void fillData() {
@@ -65,7 +64,6 @@ public class MindTimer extends ListActivity {
 
         startManagingCursor(timersCursor);
 
-        // set vars for from[], to[] of CursorAdapter
         String[] from = new String[] { TimersDbAdapter.KEY_LABEL,
                 TimersDbAdapter.KEY_INTERVAL_SECONDS };
         int[] to = new int[] { R.id.TimerLabel, R.id.Duration };
