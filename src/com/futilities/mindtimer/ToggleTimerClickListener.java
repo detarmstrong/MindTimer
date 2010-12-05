@@ -34,7 +34,7 @@ public class ToggleTimerClickListener implements OnClickListener {
     private int mTimerState;
     private float mSecElapsed; // seconds timer has been running for
 
-    public ToggleTimerClickListener(Context context, long id, int secDuration) {
+    public ToggleTimerClickListener(Context context, long id, int secDuration, long startedAtRealtime) {
         mCtx = context;
         mId = id;
         mSecDuration = secDuration;
@@ -48,7 +48,7 @@ public class ToggleTimerClickListener implements OnClickListener {
         return mTimerTask;
     }
 
-    class UpdateTimeTask extends TimerTask {
+    private class UpdateTimeTask extends TimerTask {
         public void run() {
             if (mCtx == null) {
                 Log.v("MindTimer", "canceling because mctx is null");
@@ -66,18 +66,18 @@ public class ToggleTimerClickListener implements OnClickListener {
         AlarmManager am = (AlarmManager) v.getContext().getSystemService(
                 Activity.ALARM_SERVICE);
         Intent intent = new Intent(v.getContext(), MindTimerAlarm.class);
-        
+
         intent.putExtra("timerId", (int) mId);
         Log.v("MindTimer", "putting id in extra " + mId);
-        PendingIntent sender = PendingIntent.getBroadcast(v.getContext(),
-                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                
+        PendingIntent sender = PendingIntent.getBroadcast(v.getContext(), 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         if (mTimerState == TIMER_ACTIVE) { // then pause
             mTimerState = TIMER_PAUSED;
 
             // change ui state of button to play, make the progress pie yellow
             // get view
-            ImageView d = (ImageView) ((MindTimer) mCtx).getListView()
+            ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
                     .findViewWithTag(mId);
             d.setImageResource(R.drawable.slowpoke_play_button);
 
@@ -98,8 +98,9 @@ public class ToggleTimerClickListener implements OnClickListener {
                 // and exits out and returns the elapsed state should remain
 
             } else if (mTimerState == TIMER_NOT_STARTED) {
-                mAlarmDingAt = SystemClock.elapsedRealtime() + (mSecDuration * 1000);
-                
+                mAlarmDingAt = SystemClock.elapsedRealtime()
+                        + (mSecDuration * 1000);
+
             }
 
             // Use system alarm service so alarms can background
@@ -121,7 +122,7 @@ public class ToggleTimerClickListener implements OnClickListener {
             super.handleMessage(msg);
 
             mSecElapsed += .5;
-            
+
             if (SystemClock.elapsedRealtime() > mAlarmDingAt) {
                 mTimerState = TIMER_DINGED;
                 mTimerTask.cancel();
@@ -131,20 +132,20 @@ public class ToggleTimerClickListener implements OnClickListener {
 
             float degrees = percentComplete * 360;
 
-            ImageView d = (ImageView) ((MindTimer) mCtx).getListView()
+            ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
                     .findViewWithTag(mId);
 
             if (d != null) {
 
-                if(mTimerState == TIMER_ACTIVE){
-                    // TODO move this so it only happens on the button clicks, not
+                if (mTimerState == TIMER_ACTIVE) {
+                    // TODO move this so it only happens on the button clicks,
+                    // not
                     // on timer tick
                     d.setImageResource(R.drawable.slowpoke_pause_button);
-                    
-                }
-                else if(mTimerState == TIMER_DINGED){
+
+                } else if (mTimerState == TIMER_DINGED) {
                     d.setImageResource(R.drawable.slowpoke_stop_button);
-                    
+
                 }
 
                 // get pie progress view and update it
@@ -162,5 +163,13 @@ public class ToggleTimerClickListener implements OnClickListener {
 
         }
     };
+
+    public long getTimerId() {
+        return mId;
+    }
+
+    public float getSecondsElapsed() {
+        return mSecElapsed;
+    }
 
 }

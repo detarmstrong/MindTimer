@@ -22,7 +22,7 @@
 
 	<TextView android:text="0 mins" android:id="@+id/Duration"
 		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"
-		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
 
 <!--	<ProgressBar android:id="@+id/ProgressBar01"-->

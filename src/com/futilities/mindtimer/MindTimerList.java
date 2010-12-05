@@ -7,6 +7,8 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,12 +18,12 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-public class MindTimer extends ListActivity {
+public class MindTimerList extends ListActivity {
     private static final int ACTIVITY_CREATE = 1;
     private static final int ACTIVITY_EDIT = 0;
     private final int INSERT_ID = 1;
     private TimersDbAdapter mDbHelper;
-    private MindTimer mCtx;
+    private MindTimerList mCtx;
     protected ImageButton mToggleBtn;
     protected ArrayList<ToggleTimerClickListener> mToggleTimerClickListenerArrayList = new ArrayList<ToggleTimerClickListener>();
 
@@ -37,25 +39,46 @@ public class MindTimer extends ListActivity {
 
         fillData();
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
-        
-        // stop any active running TimerTasks; let them be resumed!
-        for(ToggleTimerClickListener listener : mToggleTimerClickListenerArrayList){
+
+        Log.i("MindTimer", "mind timer activity paused");
+
+        for (ToggleTimerClickListener listener : mToggleTimerClickListenerArrayList) {
             TimerTask t = listener.getTimerTask();
-            if(t != null){
+            long timerId = listener.getTimerId();
+            long startedAtMillisSinceBoot = SystemClock.elapsedRealtime()
+                    - (long) (listener.getSecondsElapsed() * 1000);
+
+            if (t != null) { // save state of timer
+
+                mDbHelper.update(timerId, startedAtMillisSinceBoot);
+
                 t.cancel();
             }
         }
+        
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Log.i("MindTimer", "mind timer activity stopped");
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        //TODO find timers that are still progressing
+        // if elapsedRealtime is less than the started at time, then a reboot occured. Invalidate the 
+        // started at time
         
-        //TODO resume the timers that were active when the intent went away
+        //TODO find timers that have fully elapse and the toast came up - these ones show as completed
     }
 
     private void fillData() {
@@ -65,7 +88,7 @@ public class MindTimer extends ListActivity {
         startManagingCursor(timersCursor);
 
         String[] from = new String[] { TimersDbAdapter.KEY_LABEL,
-                TimersDbAdapter.KEY_INTERVAL_SECONDS };
+                TimersDbAdapter.KEY_SECONDS };
         int[] to = new int[] { R.id.TimerLabel, R.id.Duration };
 
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(mCtx,
@@ -79,31 +102,37 @@ public class MindTimer extends ListActivity {
                 String colName = cursor.getColumnName(columnIndex);
 
                 if (colName.equals("seconds")) {
-                    
-                    //TODO  format seconds in hh:mm
+
+                    // TODO format seconds in hh:mm
                     int interval_seconds = cursor.getInt(columnIndex);
                     ((TextView) view).setText(interval_seconds + "s");
 
-                    final long id = cursor.getLong(cursor.getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
+                    final long startedAtRealtime = cursor.getLong(cursor
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT));
+                    
+                    final long id = cursor.getLong(cursor
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
 
                     // bind to the play button and set its value
                     View test = (View) view.getParent();
 
                     mToggleBtn = (ImageButton) test
                             .findViewById(R.id.ToggleTimerOnOff);
-                    
+
                     mToggleBtn.setTag(id);
-                    
+
                     ToggleTimerClickListener toggleTimerClickListener = new ToggleTimerClickListener(
-                            mCtx, id, interval_seconds);
-                    
-                    mToggleTimerClickListenerArrayList.add(toggleTimerClickListener);
-                    
+                            mCtx, id, interval_seconds, startedAtRealtime);
+
+                    mToggleTimerClickListenerArrayList
+                            .add(toggleTimerClickListener);
+
                     mToggleBtn.setOnClickListener(toggleTimerClickListener);
-                    
+
                     // also set the button to edit the timer since
                     // onListItemClick doesn't work anymore
-                    ImageButton leftButton = (ImageButton) test.findViewById(R.id.TimerImageButton);
+                    ImageButton leftButton = (ImageButton) test
+                            .findViewById(R.id.TimerImageButton);
                     leftButton.setOnClickListener(new EditClickListener(id));
 
                     return true;
@@ -144,7 +173,7 @@ public class MindTimer extends ListActivity {
         startActivityForResult(i, ACTIVITY_CREATE);
 
     }
-    
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -158,17 +187,17 @@ public class MindTimer extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
         fillData();
     }
-    
+
     private class EditClickListener implements OnClickListener {
         private Long mId;
 
-        EditClickListener(Long id){
+        EditClickListener(Long id) {
             this.mId = id;
         }
 
         @Override
         public void onClick(View v) {
-            Intent i = new Intent(MindTimer.this, TimerEdit.class);
+            Intent i = new Intent(MindTimerList.this, TimerEdit.class);
             i.putExtra(TimersDbAdapter.KEY_ROWID, mId);
             startActivityForResult(i, ACTIVITY_EDIT);
         }

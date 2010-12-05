@@ -84,7 +84,7 @@ public class TimerEdit extends Activity {
                     .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL)));
             
             mIntervalSecondsText.setText(timer.getString(timer
-                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_INTERVAL_SECONDS)));
+                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_SECONDS)));
 
         }
 
