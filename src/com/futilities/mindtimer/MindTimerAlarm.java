@@ -23,7 +23,7 @@ public class MindTimerAlarm extends BroadcastReceiver {
         String label = timer.getString(timer
                 .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL));
         
-        Toast.makeText(context, "Timer  " + label + " dings!", Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Timer '" + label + "' dings!", Toast.LENGTH_SHORT)
                 .show();
         
         //TODO clear the alarm state for this alarm with id timerId
@@ -31,5 +31,6 @@ public class MindTimerAlarm extends BroadcastReceiver {
         db.update(timerId, -1);
         
         timer.deactivate();
+        db.close();
     }
 }

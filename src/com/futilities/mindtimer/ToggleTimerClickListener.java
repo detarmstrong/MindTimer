@@ -39,6 +39,23 @@ public class ToggleTimerClickListener implements OnClickListener {
         mId = id;
         mSecDuration = secDuration;
         mTimerState = TIMER_NOT_STARTED;
+        
+        if(startedAtRealtime != 0 && startedAtRealtime != -1){
+            mSecElapsed = (SystemClock.elapsedRealtime() - startedAtRealtime) / 1000;
+            
+            if(mSecElapsed > mSecDuration){
+                // timer expired while UI was away
+                // show stopped state
+                // Do this in the start timer logic (currently in onClick)?
+                mTimerState = TIMER_DINGED;
+            }
+            else{
+                
+                //FIXME can't just call onclick here
+                onClick(new View(mCtx));                
+            }
+
+        }
     }
 
     /**
@@ -63,13 +80,13 @@ public class ToggleTimerClickListener implements OnClickListener {
 
     @Override
     public void onClick(View v) {
-        AlarmManager am = (AlarmManager) v.getContext().getSystemService(
+        AlarmManager am = (AlarmManager) mCtx.getSystemService(
                 Activity.ALARM_SERVICE);
-        Intent intent = new Intent(v.getContext(), MindTimerAlarm.class);
+        Intent intent = new Intent(mCtx, MindTimerAlarm.class);
 
         intent.putExtra("timerId", (int) mId);
         Log.v("MindTimer", "putting id in extra " + mId);
-        PendingIntent sender = PendingIntent.getBroadcast(v.getContext(), 0,
+        PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (mTimerState == TIMER_ACTIVE) { // then pause
@@ -89,33 +106,40 @@ public class ToggleTimerClickListener implements OnClickListener {
         } else if (mTimerState == TIMER_NOT_STARTED
                 || mTimerState == TIMER_PAUSED) { // then start
 
-            if (mTimerState == TIMER_PAUSED) { // then resume
-                // alarm will now ding at now plus the duration minus the
-                // seconds elapsed
-                mAlarmDingAt = (long) (SystemClock.elapsedRealtime() + (mSecDuration - mSecElapsed) * 1000);
-
-                // persist the sec elapsed of this timer - if the user pauses
-                // and exits out and returns the elapsed state should remain
-
-            } else if (mTimerState == TIMER_NOT_STARTED) {
-                mAlarmDingAt = SystemClock.elapsedRealtime()
-                        + (mSecDuration * 1000);
-
-            }
-
-            // Use system alarm service so alarms can background
-            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mAlarmDingAt, sender);
-
-            // foreground UI updates depend on this timer thread
-            mTimer = new Timer();
-            mTimerTask = new UpdateTimeTask();
-            mTimer.schedule(mTimerTask, 500, 500);
-
-            mTimerState = TIMER_ACTIVE;
+           
         }
 
     }
 
+    private void transitionToActiveState(){
+        AlarmManager am = (AlarmManager) mCtx.getSystemService(
+                Activity.ALARM_SERVICE);
+        
+        if (mTimerState == TIMER_PAUSED) { // then resume
+            // alarm will now ding at now plus the duration minus the
+            // seconds elapsed
+            mAlarmDingAt = (long) (SystemClock.elapsedRealtime() + (mSecDuration - mSecElapsed) * 1000);
+
+            // persist the sec elapsed of this timer - if the user pauses
+            // and exits out and returns the elapsed state should remain
+
+        } else if (mTimerState == TIMER_NOT_STARTED) {
+            mAlarmDingAt = SystemClock.elapsedRealtime()
+                    + (mSecDuration * 1000);
+
+        }
+
+        // Use system alarm service so alarms can background
+        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mAlarmDingAt, sender);
+
+        // foreground UI updates depend on this timer thread
+        mTimer = new Timer();
+        mTimerTask = new UpdateTimeTask();
+        mTimer.schedule(mTimerTask, 500, 500);
+
+        mTimerState = TIMER_ACTIVE;
+    }
+    
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {

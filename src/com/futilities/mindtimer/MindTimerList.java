@@ -59,7 +59,7 @@ public class MindTimerList extends ListActivity {
                 t.cancel();
             }
         }
-        
+
     }
 
     @Override
@@ -74,11 +74,13 @@ public class MindTimerList extends ListActivity {
     protected void onResume() {
         super.onResume();
 
-        //TODO find timers that are still progressing
-        // if elapsedRealtime is less than the started at time, then a reboot occured. Invalidate the 
+        // TODO find timers that are still progressing
+        // if elapsedRealtime is less than the started at time, then a reboot
+        // occured. Invalidate the
         // started at time
-        
-        //TODO find timers that have fully elapse and the toast came up - these ones show as completed
+
+        // TODO find timers that have fully elapse and the toast came up - these
+        // ones show as completed
     }
 
     private void fillData() {
@@ -107,11 +109,14 @@ public class MindTimerList extends ListActivity {
                     int interval_seconds = cursor.getInt(columnIndex);
                     ((TextView) view).setText(interval_seconds + "s");
 
-                    final long startedAtRealtime = cursor.getLong(cursor
-                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT));
-                    
                     final long id = cursor.getLong(cursor
                             .getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
+
+                    Cursor startedAt = mDbHelper.fetchOne(id);
+
+                    final long startedAtRealtime = startedAt
+                            .getLong(startedAt
+                                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT));
 
                     // bind to the play button and set its value
                     View test = (View) view.getParent();

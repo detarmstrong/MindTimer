@@ -24,7 +24,7 @@ public class TimersDbAdapter {
     private class DatabaseHelper extends SQLiteOpenHelper {
 
         private static final String DATABASE_NAME = "mind_timer_data";
-        private static final int DATABASE_VERSION = 4;
+        private static final int DATABASE_VERSION = 5;
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -104,13 +104,13 @@ public class TimersDbAdapter {
     public Cursor fetchAll() {
 
         return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_LABEL,
-                KEY_SECONDS }, null, null, null, null, null);
+                KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT }, null, null, null, null, null);
     }
 
     public Cursor fetchOne(long rowId) throws SQLException {
 
         Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] { KEY_ROWID, KEY_LABEL,
-                KEY_SECONDS }, KEY_ROWID + "=" + rowId, null, null, null, null,
+                KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT }, KEY_ROWID + "=" + rowId, null, null, null, null,
                 null);
         if (mCursor != null) {
             mCursor.moveToFirst();
