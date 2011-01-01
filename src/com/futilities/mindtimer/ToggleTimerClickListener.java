@@ -20,10 +20,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 public class ToggleTimerClickListener implements OnClickListener {
-    private static final int TIMER_NOT_STARTED = 0;
-    private static final int TIMER_ACTIVE = 1;
-    private static final int TIMER_PAUSED = 2;
-    protected static final int TIMER_DINGED = 3;
+    public static final int TIMER_NOT_STARTED = 0;
+    public static final int TIMER_ACTIVE = 1;
+    public static final int TIMER_PAUSED = 2;
+    public static final int TIMER_DINGED = 3;
     Toast mToast;
     private long mId;
     private Timer mTimer;
@@ -34,28 +34,14 @@ public class ToggleTimerClickListener implements OnClickListener {
     private int mTimerState;
     private float mSecElapsed; // seconds timer has been running for
 
-    public ToggleTimerClickListener(Context context, long id, int secDuration, long startedAtRealtime) {
+    public ToggleTimerClickListener(Context context, long id, int secDuration,
+            long startedAtRealtime, float secondsElapsed) {
         mCtx = context;
         mId = id;
         mSecDuration = secDuration;
         mTimerState = TIMER_NOT_STARTED;
-        
-        if(startedAtRealtime != 0 && startedAtRealtime != -1){
-            mSecElapsed = (SystemClock.elapsedRealtime() - startedAtRealtime) / 1000;
-            
-            if(mSecElapsed > mSecDuration){
-                // timer expired while UI was away
-                // show stopped state
-                // Do this in the start timer logic (currently in onClick)?
-                mTimerState = TIMER_DINGED;
-            }
-            else{
-                
-                //FIXME can't just call onclick here
-                onClick(new View(mCtx));                
-            }
+        // mSecElapsed = secondsElapsed;
 
-        }
     }
 
     /**
@@ -80,54 +66,98 @@ public class ToggleTimerClickListener implements OnClickListener {
 
     @Override
     public void onClick(View v) {
-        AlarmManager am = (AlarmManager) mCtx.getSystemService(
-                Activity.ALARM_SERVICE);
-        Intent intent = new Intent(mCtx, MindTimerAlarm.class);
-
-        intent.putExtra("timerId", (int) mId);
-        Log.v("MindTimer", "putting id in extra " + mId);
-        PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (mTimerState == TIMER_ACTIVE) { // then pause
             mTimerState = TIMER_PAUSED;
 
-            // change ui state of button to play, make the progress pie yellow
-            // get view
-            ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
-                    .findViewWithTag(mId);
-            d.setImageResource(R.drawable.slowpoke_play_button);
-
-            mTimer.cancel();
-            mTimerTask.cancel();
-
-            am.cancel(sender);
+            transitionToPauseState();
 
         } else if (mTimerState == TIMER_NOT_STARTED
                 || mTimerState == TIMER_PAUSED) { // then start
+            transitionToActiveState(mSecElapsed);
 
-           
+        } else if (mTimerState == TIMER_DINGED) {
+            transitionToInactiveState();
         }
 
     }
 
-    private void transitionToActiveState(){
-        AlarmManager am = (AlarmManager) mCtx.getSystemService(
-                Activity.ALARM_SERVICE);
-        
-        if (mTimerState == TIMER_PAUSED) { // then resume
-            // alarm will now ding at now plus the duration minus the
-            // seconds elapsed
-            mAlarmDingAt = (long) (SystemClock.elapsedRealtime() + (mSecDuration - mSecElapsed) * 1000);
+    public void transitionToInactiveState() {
+        // reset all timer info
+        mSecElapsed = 0;
+        mAlarmDingAt = 0;
 
-            // persist the sec elapsed of this timer - if the user pauses
-            // and exits out and returns the elapsed state should remain
+        if (mTimerTask != null) {
+            mTimerTask.cancel();
+        }
 
-        } else if (mTimerState == TIMER_NOT_STARTED) {
-            mAlarmDingAt = SystemClock.elapsedRealtime()
-                    + (mSecDuration * 1000);
+        mTimerState = TIMER_NOT_STARTED;
+
+        // reset progress meter and use play button
+        ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
+                .findViewWithTag(mId);
+
+        if (d != null) {
+            d.setImageResource(R.drawable.slowpoke_play_button);
+        }
+
+        setProgressMeter(0);
+
+    }
+
+    public void transitionToCompleteState() {
+        ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
+                .findViewWithTag(mId);
+
+        if (d != null) {
+            d.setImageResource(R.drawable.slowpoke_stop_button);
+            setProgressMeter(360);
+        }
+
+        if (mTimerTask != null) {
+            mTimerTask.cancel();
+        }
+
+        mTimerState = TIMER_DINGED;
+    }
+
+    public void transitionToPauseState() {
+        AlarmManager am = (AlarmManager) mCtx
+                .getSystemService(Activity.ALARM_SERVICE);
+        Intent intent = new Intent(mCtx, MindTimerAlarm.class);
+        intent.putExtra("timerId", (int) mId);
+        PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // change ui state of button to play, make the progress pie yellow
+        // get view
+        ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
+                .findViewWithTag(mId);
+        d.setImageResource(R.drawable.slowpoke_play_button);
+
+        mTimer.cancel();
+        mTimerTask.cancel();
+
+        am.cancel(sender);
+
+        mTimerState = TIMER_PAUSED;
+
+    }
+
+    public void transitionToActiveState(float secondsElapsed) {
+        AlarmManager am = (AlarmManager) mCtx
+                .getSystemService(Activity.ALARM_SERVICE);
+        Intent intent = new Intent(mCtx, MindTimerAlarm.class);
+        intent.putExtra("timerId", (int) mId);
+        PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (secondsElapsed != 0) {
+            setSecondsElapsed(secondsElapsed);
 
         }
+        
+        mAlarmDingAt = (long) (SystemClock.elapsedRealtime() + (mSecDuration - getSecondsElapsed()) * 1000);
 
         // Use system alarm service so alarms can background
         am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mAlarmDingAt, sender);
@@ -137,9 +167,20 @@ public class ToggleTimerClickListener implements OnClickListener {
         mTimerTask = new UpdateTimeTask();
         mTimer.schedule(mTimerTask, 500, 500);
 
-        mTimerState = TIMER_ACTIVE;
+        ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
+                .findViewWithTag(mId);
+        if (d != null) {
+            d.setImageResource(R.drawable.slowpoke_pause_button);
+        }
+
+        setTimerState(TIMER_ACTIVE);
     }
-    
+
+    private void setTimerState(int timerState) {
+        mTimerState = timerState;
+
+    }
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -148,42 +189,14 @@ public class ToggleTimerClickListener implements OnClickListener {
             mSecElapsed += .5;
 
             if (SystemClock.elapsedRealtime() > mAlarmDingAt) {
-                mTimerState = TIMER_DINGED;
-                mTimerTask.cancel();
+                transitionToCompleteState();
             }
 
             float percentComplete = (float) mSecElapsed / mSecDuration;
 
             float degrees = percentComplete * 360;
 
-            ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
-                    .findViewWithTag(mId);
-
-            if (d != null) {
-
-                if (mTimerState == TIMER_ACTIVE) {
-                    // TODO move this so it only happens on the button clicks,
-                    // not
-                    // on timer tick
-                    d.setImageResource(R.drawable.slowpoke_pause_button);
-
-                } else if (mTimerState == TIMER_DINGED) {
-                    d.setImageResource(R.drawable.slowpoke_stop_button);
-
-                }
-
-                // get pie progress view and update it
-                ShapeDrawable drabble = new PieShapeDrawable(-90, degrees, 0,
-                        0, 50, 50, 0x8074AC23);
-
-                LayerDrawable bg = (LayerDrawable) d.getBackground();
-
-                int layerId = bg.getId(1);
-
-                bg.setDrawableByLayerId(layerId, drabble);
-
-                d.setBackgroundDrawable(bg);
-            }
+            setProgressMeter(degrees);
 
         }
     };
@@ -194,6 +207,31 @@ public class ToggleTimerClickListener implements OnClickListener {
 
     public float getSecondsElapsed() {
         return mSecElapsed;
+    }
+
+    public void setSecondsElapsed(float secondsElapsed) {
+        this.mSecElapsed = secondsElapsed;
+    }
+
+    public void setProgressMeter(float degrees) {
+        ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
+                .findViewWithTag(mId);
+
+        if (d != null) {
+
+            // get pie progress view and update it
+            ShapeDrawable drabble = new PieShapeDrawable(-90, degrees, 0, 0,
+                    50, 50, 0x8074AC23);
+
+            LayerDrawable bg = (LayerDrawable) d.getBackground();
+
+            int layerId = bg.getId(1);
+
+            bg.setDrawableByLayerId(layerId, drabble);
+
+            d.setBackgroundDrawable(bg);
+        }
+
     }
 
 }

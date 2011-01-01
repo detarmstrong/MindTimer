@@ -24,7 +24,7 @@ public class TimersDbAdapter {
     private class DatabaseHelper extends SQLiteOpenHelper {
 
         private static final String DATABASE_NAME = "mind_timer_data";
-        private static final int DATABASE_VERSION = 5;
+        private static final int DATABASE_VERSION = 6;
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,14 +32,11 @@ public class TimersDbAdapter {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            String populateSchemaSql = "create table " + DATABASE_TABLE + 
-                    " (" +
-                    "_id integer primary key autoincrement, " + 
-                    "label text not null, " +
-            		"seconds integer not null, " +
-            		"started_at_millis_since_boot integer" +
-    				");" + 
-                    "create index if not exists label_text on timers(label);";
+            String populateSchemaSql = "create table " + DATABASE_TABLE + " ("
+                    + "_id integer primary key autoincrement, "
+                    + "label text not null, " + "seconds integer not null, "
+                    + "started_at_millis_since_boot integer" + ");"
+                    + "create index if not exists label_text on timers(label);";
 
             db.execSQL(populateSchemaSql);
 
@@ -94,8 +91,8 @@ public class TimersDbAdapter {
 
         return mDb.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
     }
-    
-    public void truncate(){
+
+    public void truncate() {
         String sql = "delete from " + DATABASE_TABLE;
 
         mDb.execSQL(sql);
@@ -104,19 +101,27 @@ public class TimersDbAdapter {
     public Cursor fetchAll() {
 
         return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_LABEL,
-                KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT }, null, null, null, null, null);
+                KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT }, null, null,
+                null, null, null);
     }
 
     public Cursor fetchOne(long rowId) throws SQLException {
 
-        Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] { KEY_ROWID, KEY_LABEL,
-                KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT }, KEY_ROWID + "=" + rowId, null, null, null, null,
-                null);
-        if (mCursor != null) {
-            mCursor.moveToFirst();
+        Cursor cursor = mDb.query(true, DATABASE_TABLE, new String[] {
+                KEY_ROWID, KEY_LABEL, KEY_SECONDS,
+                KEY_STARTED_AT_MILLIS_SINCE_BOOT }, KEY_ROWID + "=" + rowId,
+                null, null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
         }
-        return mCursor;
+        return cursor;
 
+    }
+
+    public Cursor fetchWhere(String whereClause) {
+        return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_LABEL,
+                KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT }, whereClause,
+                null, null, null, KEY_ROWID);
     }
 
     public boolean update(long rowId, String label, int intervalSeconds) {
@@ -126,8 +131,8 @@ public class TimersDbAdapter {
 
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
-    
-    public boolean update(long rowId, long startedAtMillisSinceBoot){
+
+    public boolean update(long rowId, long startedAtMillisSinceBoot) {
         ContentValues args = new ContentValues();
         args.put(KEY_STARTED_AT_MILLIS_SINCE_BOOT, startedAtMillisSinceBoot);
 

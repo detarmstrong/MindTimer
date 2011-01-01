@@ -44,8 +44,6 @@ public class MindTimerList extends ListActivity {
     protected void onPause() {
         super.onPause();
 
-        Log.i("MindTimer", "mind timer activity paused");
-
         for (ToggleTimerClickListener listener : mToggleTimerClickListenerArrayList) {
             TimerTask t = listener.getTimerTask();
             long timerId = listener.getTimerId();
@@ -53,9 +51,7 @@ public class MindTimerList extends ListActivity {
                     - (long) (listener.getSecondsElapsed() * 1000);
 
             if (t != null) { // save state of timer
-
                 mDbHelper.update(timerId, startedAtMillisSinceBoot);
-
                 t.cancel();
             }
         }
@@ -74,13 +70,47 @@ public class MindTimerList extends ListActivity {
     protected void onResume() {
         super.onResume();
 
-        // TODO find timers that are still progressing
-        // if elapsedRealtime is less than the started at time, then a reboot
-        // occured. Invalidate the
-        // started at time
+        Cursor timersWithProgress = mDbHelper
+                .fetchWhere(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT
+                        + " > 0");
 
-        // TODO find timers that have fully elapse and the toast came up - these
-        // ones show as completed
+        while (timersWithProgress.moveToNext()) {
+            long timerId = timersWithProgress.getLong(timersWithProgress
+                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
+
+            long startedAtRealtime = timersWithProgress
+                    .getLong(timersWithProgress
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT));
+
+            long timerDurationSeconds = timersWithProgress
+                    .getLong(timersWithProgress
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_SECONDS));
+
+            float secondsElapsed = (SystemClock.elapsedRealtime() - startedAtRealtime) / 1000;
+
+            // Find controller for this timer
+            for (ToggleTimerClickListener listener : mToggleTimerClickListenerArrayList) {
+                if (listener.getTimerId() == timerId) {
+                    if (secondsElapsed >= timerDurationSeconds) {
+                        listener.transitionToCompleteState();
+                    } else {
+                        // TODO check for previous state
+                        // if paused then transition to paused state
+
+                        // FIXME this will start a new AlarmManager
+                        // even though there is one still running!
+                        listener.transitionToActiveState(secondsElapsed);
+                    }
+
+                    mDbHelper.update(timerId, -1);
+
+                    break;
+
+                }
+            }
+
+        }
+
     }
 
     private void fillData() {
@@ -112,12 +142,6 @@ public class MindTimerList extends ListActivity {
                     final long id = cursor.getLong(cursor
                             .getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
 
-                    Cursor startedAt = mDbHelper.fetchOne(id);
-
-                    final long startedAtRealtime = startedAt
-                            .getLong(startedAt
-                                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT));
-
                     // bind to the play button and set its value
                     View test = (View) view.getParent();
 
@@ -127,7 +151,7 @@ public class MindTimerList extends ListActivity {
                     mToggleBtn.setTag(id);
 
                     ToggleTimerClickListener toggleTimerClickListener = new ToggleTimerClickListener(
-                            mCtx, id, interval_seconds, startedAtRealtime);
+                            mCtx, id, interval_seconds, -1, 0);
 
                     mToggleTimerClickListenerArrayList
                             .add(toggleTimerClickListener);
