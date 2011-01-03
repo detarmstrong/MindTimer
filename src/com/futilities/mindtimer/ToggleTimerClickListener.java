@@ -22,6 +22,7 @@ import android.widget.Toast;
 public class ToggleTimerClickListener implements OnClickListener {
     public static final int TIMER_NOT_STARTED = 0;
     public static final int TIMER_ACTIVE = 1;
+    public static final int TIMER_BACKGROUND_ACTIVE = 4;
     public static final int TIMER_PAUSED = 2;
     public static final int TIMER_DINGED = 3;
     Toast mToast;
@@ -72,11 +73,17 @@ public class ToggleTimerClickListener implements OnClickListener {
 
             transitionToPauseState();
 
-        } else if (mTimerState == TIMER_NOT_STARTED
+        } 
+        else if (mTimerState == TIMER_NOT_STARTED
                 || mTimerState == TIMER_PAUSED) { // then start
-            transitionToActiveState(mSecElapsed);
+            transitionToActiveState(mSecElapsed, false);
 
-        } else if (mTimerState == TIMER_DINGED) {
+        } 
+        else if (mTimerState == TIMER_BACKGROUND_ACTIVE) { // update UI from database, alarm manager running
+            transitionToActiveState(mSecElapsed, true);
+            
+        }
+        else if (mTimerState == TIMER_DINGED) {
             transitionToInactiveState();
         }
 
@@ -91,8 +98,8 @@ public class ToggleTimerClickListener implements OnClickListener {
             mTimerTask.cancel();
         }
 
-        mTimerState = TIMER_NOT_STARTED;
-
+        setTimerState(TIMER_NOT_STARTED);
+        
         // reset progress meter and use play button
         ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
                 .findViewWithTag(mId);
@@ -101,7 +108,7 @@ public class ToggleTimerClickListener implements OnClickListener {
             d.setImageResource(R.drawable.slowpoke_play_button);
         }
 
-        setProgressMeter(0);
+        setProgressMeter(0,1);
 
     }
 
@@ -111,14 +118,14 @@ public class ToggleTimerClickListener implements OnClickListener {
 
         if (d != null) {
             d.setImageResource(R.drawable.slowpoke_stop_button);
-            setProgressMeter(360);
+            setProgressMeter(1,1);
         }
 
         if (mTimerTask != null) {
             mTimerTask.cancel();
         }
 
-        mTimerState = TIMER_DINGED;
+        setTimerState(TIMER_DINGED);
     }
 
     public void transitionToPauseState() {
@@ -140,27 +147,33 @@ public class ToggleTimerClickListener implements OnClickListener {
 
         am.cancel(sender);
 
-        mTimerState = TIMER_PAUSED;
+        setTimerState(TIMER_PAUSED);
 
     }
 
-    public void transitionToActiveState(float secondsElapsed) {
-        AlarmManager am = (AlarmManager) mCtx
-                .getSystemService(Activity.ALARM_SERVICE);
-        Intent intent = new Intent(mCtx, MindTimerAlarm.class);
-        intent.putExtra("timerId", (int) mId);
-        PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        if (secondsElapsed != 0) {
+    public void transitionToActiveState(float secondsElapsed, boolean resumeBackgroundActive) {
+        if (secondsElapsed != 0) { 
+            // timer has seconds on the clock, is either paused or backgrounded
             setSecondsElapsed(secondsElapsed);
 
         }
         
-        mAlarmDingAt = (long) (SystemClock.elapsedRealtime() + (mSecDuration - getSecondsElapsed()) * 1000);
-
-        // Use system alarm service so alarms can background
-        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mAlarmDingAt, sender);
+        mAlarmDingAt = (long) (SystemClock.elapsedRealtime() 
+                + (mSecDuration - getSecondsElapsed()) * 1000);
+        
+        //TODO need sanity check that alarmManager is actually running
+        
+        if(!resumeBackgroundActive){// then AlarmManager already running            
+            AlarmManager am = (AlarmManager) mCtx
+                    .getSystemService(Activity.ALARM_SERVICE);
+            Intent intent = new Intent(mCtx, MindTimerAlarm.class);
+            intent.putExtra("timerId", (int) mId);
+            PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+    
+            // Use system alarm service so alarms can background
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mAlarmDingAt, sender);
+        }
 
         // foreground UI updates depend on this timer thread
         mTimer = new Timer();
@@ -172,11 +185,34 @@ public class ToggleTimerClickListener implements OnClickListener {
         if (d != null) {
             d.setImageResource(R.drawable.slowpoke_pause_button);
         }
+        else{
+            Log.e("mindtimer", "no image view found for " + mId);
+            
+        }
 
         setTimerState(TIMER_ACTIVE);
     }
+    
+    /**
+     * Kill ui timer task, let the TimerManager roll and save the timer progress
+     * @param dbHelper
+     */
+    public void transitionToBackgroundActiveState(TimersDbAdapter dbHelper) {
+        TimerTask t = getTimerTask();
+        long timerId = getTimerId();
+        long startedAtMillisSinceBoot = SystemClock.elapsedRealtime()
+                - (long) (getSecondsElapsed() * 1000);
 
-    private void setTimerState(int timerState) {
+        if (t != null) { //if a running timer, save state of timer
+            dbHelper.update(timerId, startedAtMillisSinceBoot);
+            t.cancel();
+        }
+        
+        setTimerState(TIMER_BACKGROUND_ACTIVE);
+        
+    }
+
+    public void setTimerState(int timerState) {
         mTimerState = timerState;
 
     }
@@ -192,11 +228,7 @@ public class ToggleTimerClickListener implements OnClickListener {
                 transitionToCompleteState();
             }
 
-            float percentComplete = (float) mSecElapsed / mSecDuration;
-
-            float degrees = percentComplete * 360;
-
-            setProgressMeter(degrees);
+            setProgressMeter(mSecElapsed, mSecDuration);
 
         }
     };
@@ -212,8 +244,11 @@ public class ToggleTimerClickListener implements OnClickListener {
     public void setSecondsElapsed(float secondsElapsed) {
         this.mSecElapsed = secondsElapsed;
     }
+    
+    public void setProgressMeter(float secondsElapsed, int durationInSeconds) {
+        
+        float degrees = ((float) secondsElapsed / durationInSeconds) * 360;
 
-    public void setProgressMeter(float degrees) {
         ImageView d = (ImageView) ((MindTimerList) mCtx).getListView()
                 .findViewWithTag(mId);
 
@@ -233,5 +268,7 @@ public class ToggleTimerClickListener implements OnClickListener {
         }
 
     }
+
+
 
 }

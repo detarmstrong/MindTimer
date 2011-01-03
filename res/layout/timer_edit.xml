@@ -5,15 +5,24 @@
 	<TextView android:text="Duration" android:id="@+id/DurationLabel"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 
-	<Spinner android:id="@+id/hourSpinner" android:layout_width="fill_parent"
+	<Spinner android:id="@+id/HourSpinner" android:layout_width="wrap_content"
 		android:layout_below="@id/DurationLabel" android:layout_height="wrap_content"
 		android:prompt="@string/hour_prompt" />
 
-	<EditText android:id="@+id/IntervalEdit" android:layout_below="@id/DurationLabel"
-		android:layout_width="match_parent" android:layout_height="wrap_content" />
+    <TextView android:text=":" android:id="@+id/HMColon"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_below="@id/DurationLabel" android:layout_toRightOf="@id/HourSpinner"
+     ></TextView>		
+        
+	<Spinner android:id="@+id/MinuteSpinner" android:layout_width="wrap_content"
+        android:layout_below="@id/DurationLabel" android:layout_toRightOf="@id/HMColon" android:layout_height="wrap_content"
+        android:prompt="@string/minute_prompt" />
+
+<!--	<EditText android:id="@+id/IntervalEdit" android:layout_below="@id/DurationLabel"-->
+<!--		android:layout_width="match_parent" android:layout_height="wrap_content" />-->
 
 	<TextView android:text="Label" android:id="@+id/TextView02"
-		android:layout_below="@id/IntervalEdit" android:layout_width="wrap_content"
+		android:layout_below="@id/HourSpinner" android:layout_width="wrap_content"
 		android:layout_height="wrap_content"></TextView>
 
 	<EditText android:text="" android:id="@+id/LabelEdit" android:layout_below="@id/TextView02"

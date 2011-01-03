@@ -36,24 +36,29 @@ public class MindTimerList extends ListActivity {
         mDbHelper.open();
 
         mCtx = this;
+        
+        Log.i("mindtimer", "in onCreate");
 
+    }
+    
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("mindtimer", "in onStart");
         fillData();
     }
+
 
     @Override
     protected void onPause() {
         super.onPause();
+        
+        Log.i("mindtimer", "in onPause");
 
         for (ToggleTimerClickListener listener : mToggleTimerClickListenerArrayList) {
-            TimerTask t = listener.getTimerTask();
-            long timerId = listener.getTimerId();
-            long startedAtMillisSinceBoot = SystemClock.elapsedRealtime()
-                    - (long) (listener.getSecondsElapsed() * 1000);
-
-            if (t != null) { // save state of timer
-                mDbHelper.update(timerId, startedAtMillisSinceBoot);
-                t.cancel();
-            }
+            // transition to running in background
+            listener.transitionToBackgroundActiveState(mDbHelper);
+            
         }
 
     }
@@ -96,10 +101,11 @@ public class MindTimerList extends ListActivity {
                     } else {
                         // TODO check for previous state
                         // if paused then transition to paused state
+                        
+                        Log.i("mindtimer", "in onResume for timer with id " + timerId);
 
-                        // FIXME this will start a new AlarmManager
-                        // even though there is one still running!
-                        listener.transitionToActiveState(secondsElapsed);
+                        listener.setTimerState(ToggleTimerClickListener.TIMER_BACKGROUND_ACTIVE);
+                        listener.transitionToActiveState(secondsElapsed, true);
                     }
 
                     mDbHelper.update(timerId, -1);
@@ -114,6 +120,9 @@ public class MindTimerList extends ListActivity {
     }
 
     private void fillData() {
+        
+        Log.i("mindtimer", "in start of fillData");
+        
         // get cursor for all timers
         Cursor timersCursor = mDbHelper.fetchAll();
 
@@ -134,13 +143,20 @@ public class MindTimerList extends ListActivity {
                 String colName = cursor.getColumnName(columnIndex);
 
                 if (colName.equals("seconds")) {
-
-                    // TODO format seconds in hh:mm
-                    int interval_seconds = cursor.getInt(columnIndex);
-                    ((TextView) view).setText(interval_seconds + "s");
-
                     final long id = cursor.getLong(cursor
                             .getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
+                    
+                    int minuteLabel = cursor.getInt(cursor
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_MINUTE_LABEL));
+                    
+                    int hourLabel = cursor.getInt(cursor
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_HOUR_LABEL));
+                    
+                    ((TextView) view).setText(((hourLabel < 10) ? "0" + hourLabel : hourLabel)
+                            + ":" 
+                            + ((minuteLabel < 10) ? "0" + minuteLabel : minuteLabel));
+                    
+                    int interval_seconds = cursor.getInt(columnIndex);
 
                     // bind to the play button and set its value
                     View test = (View) view.getParent();
@@ -149,6 +165,8 @@ public class MindTimerList extends ListActivity {
                             .findViewById(R.id.ToggleTimerOnOff);
 
                     mToggleBtn.setTag(id);
+                    
+                    Log.i("mindtimer", "in fillData, set tag " + id);
 
                     ToggleTimerClickListener toggleTimerClickListener = new ToggleTimerClickListener(
                             mCtx, id, interval_seconds, -1, 0);
@@ -162,6 +180,7 @@ public class MindTimerList extends ListActivity {
                     // onListItemClick doesn't work anymore
                     ImageButton leftButton = (ImageButton) test
                             .findViewById(R.id.TimerImageButton);
+                    
                     leftButton.setOnClickListener(new EditClickListener(id));
 
                     return true;
@@ -214,6 +233,7 @@ public class MindTimerList extends ListActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.i("mindtimer", "in onActivityResult");
         fillData();
     }
 

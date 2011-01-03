@@ -5,7 +5,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class TimerEdit extends Activity {
@@ -13,7 +15,8 @@ public class TimerEdit extends Activity {
     private TimersDbAdapter mDb;
     private Long mTimerId;
     private TextView mLabelText;
-    private TextView mIntervalSecondsText;
+    private Spinner mIntervalHourSpinner;
+    private Spinner mIntervalMinuteSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +29,17 @@ public class TimerEdit extends Activity {
         setTitle(R.string.edit_timer);
 
         mLabelText = (TextView) findViewById(R.id.LabelEdit);
-        mIntervalSecondsText = (TextView) findViewById(R.id.IntervalEdit);
+        mIntervalHourSpinner = (Spinner) findViewById(R.id.HourSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.hours_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mIntervalHourSpinner.setAdapter(adapter);
+        
+        mIntervalMinuteSpinner = (Spinner) findViewById(R.id.MinuteSpinner);
+        ArrayAdapter<CharSequence> minAdapter = ArrayAdapter.createFromResource(
+                this, R.array.minutes_array, android.R.layout.simple_spinner_item);
+        minAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mIntervalMinuteSpinner.setAdapter(minAdapter);
 
         // get timer id from savedInstanceState
         mTimerId = (savedInstanceState == null) ? null
@@ -71,8 +84,8 @@ public class TimerEdit extends Activity {
         Log.v("MindTimer", "clearing fields");
         
         mLabelText.setText("");
-        mIntervalSecondsText.setText("");
-        
+        mIntervalMinuteSpinner.setSelection(0);
+        mIntervalHourSpinner.setSelection(0);
     }
 
     private void populateFields() {
@@ -83,8 +96,12 @@ public class TimerEdit extends Activity {
             mLabelText.setText(timer.getString(timer
                     .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL)));
             
-            mIntervalSecondsText.setText(timer.getString(timer
-                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_SECONDS)));
+            mIntervalMinuteSpinner.setSelection(timer.getInt(timer
+                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_MINUTE_LABEL)));
+            
+            mIntervalHourSpinner.setSelection(timer.getInt(timer
+                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_HOUR_LABEL)));
+            
 
         }
 
@@ -104,14 +121,19 @@ public class TimerEdit extends Activity {
     private void saveState() {
         String label = mLabelText.getText().toString();
         
-        int intervalSeconds = Integer.parseInt(mIntervalSecondsText.getText()
+        int hourLabel = Integer.parseInt(mIntervalHourSpinner.getSelectedItem()
                 .toString());
+        
+        int minuteLabel = Integer.parseInt(mIntervalMinuteSpinner.getSelectedItem()
+                .toString());
+        
+        int intervalSeconds = (minuteLabel * 60) + (hourLabel * 60 * 60);
 
         if (mTimerId == null) {
-            long id = mDb.create(label, intervalSeconds);
+            long id = mDb.create(label, intervalSeconds, minuteLabel, hourLabel);
 
         } else {
-            mDb.update(mTimerId, label, intervalSeconds);
+            mDb.update(mTimerId, label, intervalSeconds, minuteLabel, hourLabel);
         }
 
     }
