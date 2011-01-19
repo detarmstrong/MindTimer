@@ -38,6 +38,12 @@ public class MindTimerList extends ListActivity {
         mCtx = this;
         
         Log.i("mindtimer", "in onCreate");
+        
+        Intent intent = getIntent();
+        
+        String action = intent.getAction();
+        
+        Log.i("mindtimer", action);
 
     }
     

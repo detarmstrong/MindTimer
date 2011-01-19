@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="picker_background">#000</color>
+<color name="grid_line_hilite">#FFF2FF03</color>
+<color name="tile_selected">#55F2FF03</color>
+<color name="grid_line">#fff</color>
+<color name="foreground">#fff</color>
+</resources>
