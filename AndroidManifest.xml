@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.futilities.mindtimer"
-	android:versionCode="1" android:versionName="1.0">
+	android:versionCode="1" android:versionName="1.0" android:installLocation="internalOnly">
+	<uses-permission android:name="android.permission.NFC" />
+
+	<!-- Must install internalOnly because AlarmManagers are killed when files system mounted 
+		on usb http://developer.android.com/guide/appendix/install-location.html#ShouldNot -->
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:debuggable="true">
 		<service android:process=":remote" android:name="MindTimerService" />
 		<receiver android:process=":remote" android:name="MindTimerAlarm" />
 		<activity android:name=".MindTimerList" android:label="@string/app_name">
 			<intent-filter>
-<!--				<action android:name="android.intent.action.MAIN" />-->
-<!--				<category android:name="android.intent.category.LAUNCHER" />-->
-				<action android:name="android.nfc.action.TAG_DISCOVERED"></action>
-				<category android:name="android.intent.category.DEFAULT"></category>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+				<!-- <action android:name="android.nfc.action.TAG_DISCOVERED"></action> -->
+				<!-- <category android:name="android.intent.category.DEFAULT"></category> -->
 			</intent-filter>
 		</activity>
 
 		<activity android:name="TimerEdit"></activity>
-		
-		<activity android:name="IntervalPicker" android:label="Set Duration">
+
+		<activity android:name="IntervalPicker" android:label="Set Duration"
+			android:screenOrientation="portrait">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category android:name="android.intent.category.LAUNCHER"></category>
+				<!-- <action android:name="android.intent.action.MAIN"></action> -->
+				<!-- <category android:name="android.intent.category.LAUNCHER"></category> -->
+			</intent-filter>
+		</activity>
+		<activity android:screenOrientation="portrait" android:launchMode="standard"
+			android:name="TagTimerActivity">
+			<intent-filter>
+				<action android:name="android.nfc.action.TAG_DISCOVERED" />
+				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
 	</application>
 
-
+	<uses-feature android:name="android.hardware.nfc" android:required="false" />
+	<supports-screens android:anyDensity="true"></supports-screens>
 </manifest> 

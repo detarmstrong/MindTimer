@@ -6,6 +6,8 @@ import java.util.TimerTask;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -188,6 +190,14 @@ public class MindTimerList extends ListActivity {
                             .findViewById(R.id.TimerImageButton);
                     
                     leftButton.setOnClickListener(new EditClickListener(id));
+                    
+                    String thumbnailAbsolutePath = String.valueOf(cursor.getString(cursor
+                            .getColumnIndexOrThrow(TimersDbAdapter.KEY_THUMBNAIL_ABSOLUTE_PATH)));
+                    
+                    // set background image for button
+                    Bitmap bm = BitmapFactory.decodeFile(thumbnailAbsolutePath);
+                    
+                    leftButton.setImageBitmap(bm);
 
                     return true;
                 }

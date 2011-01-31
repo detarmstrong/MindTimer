@@ -4,11 +4,20 @@
 	android:orientation="vertical">
 
 	<LinearLayout android:id="@+id/LinearLayout01" android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<TextView android:text="00:00" android:layout_height="wrap_content"
-			android:layout_width="fill_parent" android:id="@+id/DigitView" android:singleLine="true"
-			android:gravity="center_horizontal" android:textSize="55sp"></TextView>
-
+		android:layout_height="wrap_content" android:gravity="center_horizontal">
+		
+		<TextView android:text="00" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:id="@+id/HourPartText" android:singleLine="true"
+			android:gravity="right" android:textSize="55sp"/>
+			
+        <TextView android:text=":" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:id="@+id/HourPartText" android:singleLine="true"
+            android:gravity="right" android:textSize="55sp"/>
+            		
+        <TextView android:text="00" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:id="@+id/MinutePartText" android:singleLine="true"
+            android:gravity="left" android:textSize="55sp"/>
+            
 	</LinearLayout>
 
 	<LinearLayout android:id="@+id/LinearLayout02" android:layout_width="fill_parent"
@@ -65,12 +74,12 @@
 <!---->
 	<!-- </LinearLayout> -->
 	<LinearLayout android:id="@+id/NumPadLayout" android:layout_width="wrap_content"
-		android:layout_height="250dp">
+		android:layout_height="0dp" android:layout_weight="4">
 
 	</LinearLayout>
 
 	<LinearLayout android:id="@+id/LinearLayout07" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:paddingTop="5dp">
+		android:layout_height="0dp" android:layout_weight="1" android:paddingTop="10dp">
 		
 <!--		android:layout_width="0dp" android:layout_weight="1"-->
 		<Button android:text="Cancel" android:id="@+id/CancelButton"

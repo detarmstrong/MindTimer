@@ -5,4 +5,6 @@
 <color name="tile_selected">#55F2FF03</color>
 <color name="grid_line">#fff</color>
 <color name="foreground">#fff</color>
+<color name="button_selected">#FFF2FF03</color>
+<color name="button_deselected">#999999</color>
 </resources>

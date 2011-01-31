@@ -5,34 +5,25 @@
 	<TextView android:text="Duration" android:id="@+id/DurationLabel"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 
-	<Spinner android:id="@+id/HourSpinner" android:layout_width="wrap_content"
-		android:layout_below="@id/DurationLabel" android:layout_height="wrap_content"
-		android:prompt="@string/hour_prompt" />
-
-    <TextView android:text=":" android:id="@+id/HMColon"
+    <TextView android:text="00:00" android:id="@+id/Interval2"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_below="@id/DurationLabel" android:layout_toRightOf="@id/HourSpinner"
-     ></TextView>		
-        
-	<Spinner android:id="@+id/MinuteSpinner" android:layout_width="wrap_content"
-        android:layout_below="@id/DurationLabel" android:layout_toRightOf="@id/HMColon" android:layout_height="wrap_content"
-        android:prompt="@string/minute_prompt" />
+        android:layout_below="@id/DurationLabel" android:textSize="45sp"></TextView>        
 
 <!--	<EditText android:id="@+id/IntervalEdit" android:layout_below="@id/DurationLabel"-->
 <!--		android:layout_width="match_parent" android:layout_height="wrap_content" />-->
 
 	<TextView android:text="Label" android:id="@+id/TextView02"
-		android:layout_below="@id/HourSpinner" android:layout_width="wrap_content"
+		android:layout_below="@id/Interval2" android:layout_width="wrap_content"
 		android:layout_height="wrap_content"></TextView>
 
 	<EditText android:text="" android:id="@+id/LabelEdit" android:layout_below="@id/TextView02"
 		android:layout_width="match_parent" android:layout_height="wrap_content"></EditText>
 
-	<ImageButton android:id="@+id/ImageView01" android:layout_below="@id/LabelEdit"
+	<ImageButton android:id="@+id/TimerIcon" android:layout_below="@id/LabelEdit"
 		android:layout_width="50dp" android:layout_height="50dp" android:src="@drawable/button_down" />
 
 	<Button android:text="Take Picture" android:id="@+id/TakePicButton"
-		android:layout_toRightOf="@id/ImageView01" android:layout_below="@id/LabelEdit"
+		android:layout_toRightOf="@id/TimerIcon" android:layout_below="@id/LabelEdit"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
 
 	<View android:id="@+id/View01" android:layout_below="@id/TakePicButton"
