@@ -26,7 +26,6 @@ public class MindTimerAlarm extends BroadcastReceiver {
         Toast.makeText(context, "Timer '" + label + "' dings!", Toast.LENGTH_SHORT)
                 .show();
         
-        
         db.update(timerId, -1);
         
         timer.deactivate();

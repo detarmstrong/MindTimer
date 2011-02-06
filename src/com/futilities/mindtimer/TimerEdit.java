@@ -11,21 +11,25 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class TimerEdit extends Activity {
+    private static final String TAG = "TimerEdit";
     private static final int CREATE_INTERVAL = 1;
     private static final int TAKE_PICTURE = 2;
-    private Uri outputFileUri;
     private TimersDbAdapter mDb;
     private Long mTimerId;
     private TextView mLabelText;
@@ -36,17 +40,25 @@ public class TimerEdit extends Activity {
     private ImageButton mTimerIconView;
     boolean mExternalStorageAvailable = false;
     boolean mExternalStorageWriteable = false;
+    protected boolean mResultCanceled = false;
+    private ViewGroup mNfcRegionLayout;
+    private LinearLayout mTagFoundLayout;
+    private LinearLayout mTagNotFoundLayout;
+    private LinearLayout mAppropriateNFCLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Magic (to me) to prevent the softkeyboard from coming up on activity start
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        
         mDb = new TimersDbAdapter(this);
         mDb.open();
 
-        setContentView(R.layout.timer_edit);
+        setContentView(R.layout.timer_edit_2);
         setTitle(R.string.edit_timer);
-
+        
         mLabelText = (TextView) findViewById(R.id.LabelEdit);
         mIntervalText = (TextView) findViewById(R.id.Interval2);
         mTimerIconView = (ImageButton) findViewById(R.id.TimerIcon);
@@ -70,6 +82,9 @@ public class TimerEdit extends Activity {
             public void onClick(View view) {
                 setResult(RESULT_OK);
                 finish();
+
+                Log.v(TAG, "AFTER FINISH"); // Never called because finish()
+                                            // means it's finished!
             }
 
         });
@@ -79,16 +94,14 @@ public class TimerEdit extends Activity {
 
             @Override
             public void onClick(View v) {
-                TimerEdit.this.clearFields();
-
-                // TODO prevent call to saveState()
-
+                mResultCanceled = true;
+                setResult(RESULT_CANCELED);
                 finish();
 
             }
         });
 
-        Button takePicButton = (Button) findViewById(R.id.TakePicButton);
+        ImageButton takePicButton = (ImageButton) findViewById(R.id.TimerIcon);
         takePicButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -140,7 +153,7 @@ public class TimerEdit extends Activity {
     protected void clearFields() {
         Log.v("MindTimer", "clearing fields");
 
-        mLabelText.setText("");
+        // mLabelText.setText("");
         // TODO clear interval
     }
 
@@ -166,11 +179,64 @@ public class TimerEdit extends Activity {
                     .valueOf(timer.getString(timer
                             .getColumnIndexOrThrow(TimersDbAdapter.KEY_THUMBNAIL_ABSOLUTE_PATH)));
 
-            //TODO check that file really exists; if not show headless dummy
-            // set background image for button
-            Bitmap bm = BitmapFactory.decodeFile(mThumbnailAbsolutePath);
+            Log.v(TAG, "Path to thumb:" + mThumbnailAbsolutePath);
 
-            mTimerIconView.setImageBitmap(bm);
+            File file = new File(mThumbnailAbsolutePath);
+
+            if (file.exists()) {
+                Bitmap bm = BitmapFactory.decodeFile(mThumbnailAbsolutePath);
+                mTimerIconView.setImageBitmap(bm);
+            }
+
+            // If nfc tag is attached, then show the tag_found_layout under
+            // edit_timer_nfc_layout
+            String nfcTagPayload = timer.getString(timer
+                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_NFC_ID));
+
+            mNfcRegionLayout = (ViewGroup) findViewById(R.id.edit_timer_nfc_layout);
+
+            mTagFoundLayout = (LinearLayout) getLayoutInflater().inflate(
+                    R.layout.tag_found_layout, null);
+            
+            mTagNotFoundLayout = (LinearLayout) getLayoutInflater().inflate(
+                    R.layout.tag_not_found_layout, null);
+            
+            TextView helpText = (TextView) mTagNotFoundLayout.findViewById(R.id.what_is_a_nfc_tag_text_view);
+
+            //activate links in text
+            helpText.setMovementMethod(LinkMovementMethod.getInstance());
+            
+            if (nfcTagPayload != null) {
+                mAppropriateNFCLayout = mTagFoundLayout;
+                
+                Button forgetTag = (Button) mAppropriateNFCLayout
+                        .findViewById(R.id.forget_tag_button);
+                
+                forgetTag.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDb.update(mTimerId, null);
+
+                        Toast.makeText(getApplicationContext(),
+                                "NFC tag forgotten", Toast.LENGTH_SHORT).show();
+
+                        mTagFoundLayout.removeAllViews();
+                        
+                        mNfcRegionLayout.addView(mTagNotFoundLayout);
+                    }
+                });
+
+                TextView tv = (TextView) mAppropriateNFCLayout.findViewById(R.id.tag_payload);
+                tv.setText(nfcTagPayload);
+
+            } else {
+                mAppropriateNFCLayout = mTagNotFoundLayout;
+                
+            }
+            
+            mNfcRegionLayout.addView(mAppropriateNFCLayout);
+
+
         }
 
     }
@@ -195,7 +261,12 @@ public class TimerEdit extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        saveState();
+
+        Log.v(TAG, "in onPause");
+
+        if (!mResultCanceled) {
+            saveState();
+        }
     }
 
     @Override
@@ -216,8 +287,10 @@ public class TimerEdit extends Activity {
                     if (mExternalStorageWriteable) {
                         Bitmap thumbnail = data.getParcelableExtra("data");
 
-                        int height = (90 * thumbnail.getHeight()) / thumbnail.getWidth();
-                        thumbnail = Bitmap.createScaledBitmap(thumbnail, 90, height, true); 
+                        int height = (90 * thumbnail.getHeight())
+                                / thumbnail.getWidth();
+                        thumbnail = Bitmap.createScaledBitmap(thumbnail, 90,
+                                height, true);
 
                         ImageButton icon = (ImageButton) findViewById(R.id.TimerIcon);
                         icon.setImageBitmap(thumbnail);
@@ -226,7 +299,7 @@ public class TimerEdit extends Activity {
                                 .toString();
 
                         // TODO create folder for MindTimer
-                        //TODO add .nomedia file to this dir
+                        // TODO add .nomedia file to this dir
 
                         OutputStream fOut = null;
                         File file = new File(path, "MindTimer_" + mTimerId
@@ -303,6 +376,18 @@ public class TimerEdit extends Activity {
     private void getThumbailPicture() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, TAKE_PICTURE);
+    }
+
+    // If back button clicked, don't save the contents of the form when
+    // saveState() is
+    // is called in onPause()
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            mResultCanceled = true;
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 
 }

@@ -7,6 +7,8 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.NdefMessage;
@@ -15,17 +17,16 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -58,7 +59,8 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                     msgs[i] = (NdefMessage) rawMsgs[i];
                 }
             } else {
-                // TODO what should happen here? Alert user that tag is invalid? Then what? Exit?
+                // TODO what should happen here? Alert user that tag is invalid?
+                // Then what? Exit?
                 // Unknown tag type
                 byte[] empty = new byte[] {};
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN,
@@ -70,6 +72,10 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             // get the id for each record in the tag
             if (msgs == null || msgs.length == 0) {
                 // TODO notify user that the tag can't be used here
+                Toast.makeText(this, "Tag not recognized by MindTimer",
+                        Toast.LENGTH_LONG).show();
+                setResult(RESULT_CANCELED);
+                finish();
                 return;
             }
 
@@ -86,31 +92,83 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                         "record with payload: "
                                 + mPayloadsRead.get(mPayloadsRead.size() - 1));
             }
-            
+
             mDbHelper = new TimersDbAdapter(this);
             mDbHelper.open();
-            
+
             // TODO escape single quotes in sql string?
-            // TODO if multiple viable records in message, then allow   each for associating
+            // TODO if multiple viable records in message, then allow each for
+            // associating
             Cursor foundByPayload0 = mDbHelper
                     .fetchWhere(TimersDbAdapter.KEY_NFC_ID + " = '"
                             + mPayloadsRead.get(mPayloadsRead.size() - 1) + "'");
+            startManagingCursor(foundByPayload0);
 
             if (foundByPayload0.getCount() > 0) {
+                foundByPayload0.moveToFirst();
+
                 // TODO finish this activity and start mindtimer
-                Toast.makeText(this, "Tag in DB, starting mindtimer",
-                        Toast.LENGTH_SHORT).show();
+                // TODO make custom toast that has the timer icon in it too,
+                // if there is one
+                String timerLabel = foundByPayload0.getString(foundByPayload0
+                        .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL));
+
+                String thumbnailAbsolutePath = String
+                        .valueOf(foundByPayload0.getString(foundByPayload0
+                                .getColumnIndexOrThrow(TimersDbAdapter.KEY_THUMBNAIL_ABSOLUTE_PATH)));
+
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(
+                        R.layout.timer_started_implicitly_toast,
+                        (ViewGroup) findViewById(R.id.toast_layout_root));
+
+                ImageView imageView = (ImageView) layout
+                        .findViewById(R.id.toast_icon_for_timer);
+
+                if (thumbnailAbsolutePath != null) {
+                    Bitmap bm = BitmapFactory.decodeFile(thumbnailAbsolutePath);
+
+                    if (bm != null) {
+                        imageView.setImageBitmap(bm);
+                    }
+                }
+
+                if (imageView.getBackground() == null) {
+                    imageView.setBackgroundDrawable(getResources().getDrawable(
+                            R.drawable.button_down));
+                }
+
+                TextView text = (TextView) layout.findViewById(R.id.text);
+                String toastTextString = "Timer started"
+                        + ((timerLabel != null && timerLabel.length() > 0) ? ": "
+                                + timerLabel
+                                : ".");
+                text.setText(toastTextString);
+
+                Toast toast = new Toast(getApplicationContext());
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setView(layout);
+                toast.show();
+
+                // TODO broadcast message to start timer ( sets message to
+                // notification manager
+
+                setResult(RESULT_OK);
                 finish();
+
+                Log.v(TAG, "AFTER FINISH CALLED");
+
             }
 
             setContentView(R.layout.tag_for_timer);
-            
+
             mTimerList = (LinearLayout) findViewById(R.id.timer_list);
             mCancelButton = (Button) findViewById(R.id.CancelTagForTimerButton);
             mCancelButton.setOnClickListener(this);
             mSaveButton = (Button) findViewById(R.id.SaveTagForTimerButton);
             mSaveButton.setOnClickListener(this);
-            
+
             fillData();
 
         } else {
@@ -125,11 +183,27 @@ public class TagTimerActivity extends Activity implements OnClickListener,
         LinearLayout content = mTimerList;
         content.removeAllViews();
 
-        // get cursor for all timers
-        Cursor timersCursor = mDbHelper.fetchAll();
+        // get cursor for all timers without tags
+        Cursor timersCursor = mDbHelper.fetchWhere(mDbHelper.KEY_NFC_ID
+                + " IS NULL");
         startManagingCursor(timersCursor);
 
+        // get count of all timers
+        long countAll = mDbHelper.countAll();
+
         mTimerIds = new Long[timersCursor.getCount()];
+
+        if (countAll == 0) {
+            TextView noTimersTextView = new TextView(this);
+            noTimersTextView
+                    .setText(getResources().getText(R.string.no_timers));
+            content.addView(noTimersTextView);
+        } else if (timersCursor.getCount() == 0) {
+            TextView noTimersTextView = new TextView(this);
+            noTimersTextView.setText(getResources().getText(
+                    R.string.no_untagged_timers));
+            content.addView(noTimersTextView);
+        }
 
         while (timersCursor.moveToNext()) {
             long timerId = timersCursor.getLong(timersCursor
@@ -190,17 +264,15 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             finish();
             break;
         case R.id.SaveTagForTimerButton:
-            // get selected radio button
             RadioButton selected = selectedRadioButton();
 
             if (selected != null) {
                 int timerId = selected.getId();
-                Toast.makeText(this, "Associating with timer id " + timerId,
+                Toast.makeText(this, "Scan tag again to start timer",
                         Toast.LENGTH_LONG).show();
 
                 mDbHelper.update(timerId, mPayloadsRead.get(0));
 
-                // TODO Start MindTimer activity
                 setResult(RESULT_OK);
                 finish();
             } else {

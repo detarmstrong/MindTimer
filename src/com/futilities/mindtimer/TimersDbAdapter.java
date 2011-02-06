@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 public class TimersDbAdapter {
@@ -28,7 +29,7 @@ public class TimersDbAdapter {
     private class DatabaseHelper extends SQLiteOpenHelper {
 
         private static final String DATABASE_NAME = "mind_timer_data";
-        private static final int DATABASE_VERSION = 12;
+        private static final int DATABASE_VERSION = 13;
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -104,7 +105,7 @@ public class TimersDbAdapter {
         Cursor cursor = mDb.query(true, DATABASE_TABLE, new String[] {
                 KEY_ROWID, KEY_LABEL, KEY_SECONDS,
                 KEY_STARTED_AT_MILLIS_SINCE_BOOT, KEY_MINUTE_LABEL,
-                KEY_HOUR_LABEL, KEY_THUMBNAIL_ABSOLUTE_PATH }, KEY_ROWID + "=" + rowId, null, null, null,
+                KEY_HOUR_LABEL, KEY_THUMBNAIL_ABSOLUTE_PATH, KEY_NFC_ID}, KEY_ROWID + "=" + rowId, null, null, null,
                 null, null);
 
         if (cursor != null) {
@@ -157,10 +158,16 @@ public class TimersDbAdapter {
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
 
-    public boolean update(int timerId, String recordPayload) {
+    public boolean update(long rowId, String recordPayload) {
         ContentValues args = new ContentValues();
         args.put(KEY_NFC_ID, recordPayload);
         
-        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + timerId, null) > 0;
+        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+    }
+    
+    public long countAll(){
+        String sql = "select count(*) from " + DATABASE_TABLE;
+        SQLiteStatement sqlStatement = mDb.compileStatement(sql);
+        return sqlStatement.simpleQueryForLong();
     }
 }
