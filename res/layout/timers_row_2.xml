@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:id="@+id/TimerLayout">
+
+	<ImageButton android:id="@+id/TimerImageButton"
+		android:layout_width="50dp" android:layout_height="50dp"
+		android:src="@drawable/button_down" />
+
+	<TextView android:id="@+id/TimerLabel"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/TimerImageButton" android:text="Static Text" />
+
+	<TextView android:text="0 mins" android:id="@+id/Duration"
+		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+</RelativeLayout>

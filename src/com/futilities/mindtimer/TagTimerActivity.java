@@ -69,9 +69,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                 msgs = new NdefMessage[] { msg };
             }
 
-            // get the id for each record in the tag
             if (msgs == null || msgs.length == 0) {
-                // TODO notify user that the tag can't be used here
                 Toast.makeText(this, "Tag not recognized by MindTimer",
                         Toast.LENGTH_LONG).show();
                 setResult(RESULT_CANCELED);
@@ -96,7 +94,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             mDbHelper = new TimersDbAdapter(this);
             mDbHelper.open();
 
-            // TODO escape single quotes in sql string?
+            // TODO escape single quotes in sql where string
             // TODO if multiple viable records in message, then allow each for
             // associating
             Cursor foundByPayload0 = mDbHelper
@@ -107,9 +105,6 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             if (foundByPayload0.getCount() > 0) {
                 foundByPayload0.moveToFirst();
 
-                // TODO finish this activity and start mindtimer
-                // TODO make custom toast that has the timer icon in it too,
-                // if there is one
                 String timerLabel = foundByPayload0.getString(foundByPayload0
                         .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL));
 
@@ -151,8 +146,8 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                 toast.setView(layout);
                 toast.show();
 
-                // TODO broadcast message to start timer ( sets message to
-                // notification manager
+                // TODO broadcast message to start timer (doesn't launch timer list,
+                // just sets the notification and starts manager, headless
 
                 setResult(RESULT_OK);
                 finish();
@@ -242,18 +237,6 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
         }
 
-    }
-
-    @Override
-    protected void onPause() {
-        // TODO Implement onPause
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        // TODO Auto-generated method stub
-        super.onResume();
     }
 
     @Override

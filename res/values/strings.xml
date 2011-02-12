@@ -13,7 +13,5 @@
 	<string name="minute_prompt">Min:</string>
 	<string name="forget_tag">Forget Tag</string>
 	<string name="nfc_tag">NFC Tag</string>
-	<string name="what_is_a_nfc_tag">
-		<u><a href="http://www.youtube.com/watch?v=wk5mUdeEF8c">What is NFC?</a></u>
-	</string>
+	<string name="what_is_a_nfc_tag"><u><a href="http://www.youtube.com/watch?v=wk5mUdeEF8c">What is NFC?</a></u></string>
 </resources>

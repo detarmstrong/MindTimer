@@ -27,7 +27,6 @@ public class MindTimerList extends ListActivity {
     private final int INSERT_ID = 1;
     private TimersDbAdapter mDbHelper;
     private MindTimerList mCtx;
-    protected ImageButton mToggleBtn;
     protected ArrayList<ToggleTimerClickListener> mToggleTimerClickListenerArrayList = new ArrayList<ToggleTimerClickListener>();
 
     @Override
@@ -141,9 +140,13 @@ public class MindTimerList extends ListActivity {
                 TimersDbAdapter.KEY_SECONDS };
         int[] to = new int[] { R.id.TimerLabel, R.id.Duration };
 
+        //TODOFORV2 Create new class that extends CursorAdapter, a la CountdownCursorAdapter
+        //TODOFORV2 Also create new view class extending LinearLayout, that represents a row
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(mCtx,
                 R.layout.timers_row, timersCursor, from, to);
 
+        //TODOFORV2 since we are now extending cursoradapter, in that class
+        // override newView and bindView methods, newView returns an instance of the view represents a row, extends LinearLayout
         android.widget.SimpleCursorAdapter.ViewBinder viewBinder = new SimpleCursorAdapter.ViewBinder() {
 
             @Override
@@ -174,10 +177,10 @@ public class MindTimerList extends ListActivity {
                     // bind to the play button and set its value
                     View test = (View) view.getParent();
 
-                    mToggleBtn = (ImageButton) test
+                    ImageButton toggleBtn = (ImageButton) test
                             .findViewById(R.id.ToggleTimerOnOff);
 
-                    mToggleBtn.setTag(id);
+                    toggleBtn.setTag(id);
 
                     Log.i("mindtimer", "in fillData, set tag " + id);
 
@@ -187,7 +190,7 @@ public class MindTimerList extends ListActivity {
                     mToggleTimerClickListenerArrayList
                             .add(toggleTimerClickListener);
 
-                    mToggleBtn.setOnClickListener(toggleTimerClickListener);
+                    toggleBtn.setOnClickListener(toggleTimerClickListener);
 
                     // also set the button to edit the timer since
                     // onListItemClick doesn't work anymore
