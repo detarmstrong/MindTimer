@@ -1,0 +1,17 @@
+<mockup version="1.0" skin="sketch" measuredW="174" measuredH="98" mockupW="114" mockupH="78">
+  <controls>
+    <control controlID="0" controlTypeID="__group__" x="60" y="20" w="114" h="78" measuredW="114" measuredH="78" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <controlName>test</controlName>
+      </controlProperties>
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Paragraph" x="0" y="0" w="114" h="78" measuredW="200" measuredH="140" zOrder="0" locked="false" isInGroup="0">
+          <controlProperties>
+            <size>8</size>
+            <text>A%20paragraph%20of%20text.%0A%09A%20_second_%20%5Brow%5D%20of%20*text*.%0A%09A%20_second_%20%5Brow%5D%20of%20*text*.%0A%09A%20_second_%20%5Brow%5D%20of%20*text*.%0A%09A%20_second_%20%5Brow%5D%20of%20*text*.</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>

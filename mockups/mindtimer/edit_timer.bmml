@@ -1,0 +1,66 @@
+<mockup version="1.0" skin="sketch" measuredW="941" measuredH="561" mockupW="572" mockupH="510">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::iPhone" x="369" y="51" w="-1" h="-1" measuredW="282" measuredH="510" zOrder="0" locked="false" isInGroup="-1"/>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="407" y="379" w="-1" h="-1" measuredW="94" measuredH="28" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Forget%20Tag</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="407" y="159" w="-1" h="-1" measuredW="56" measuredH="25" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Duration</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Label" x="407" y="213" w="-1" h="-1" measuredW="38" measuredH="25" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Label</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="407" y="175" w="-1" h="-1" measuredW="74" measuredH="40" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>24</size>
+        <text>00%3A15</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::TextInput" x="407" y="234" w="206" h="-1" measuredW="77" measuredH="29" zOrder="6" locked="false" isInGroup="-1"/>
+    <control controlID="10" controlTypeID="__group__" x="407" y="275" w="164" h="71" measuredW="164" measuredH="71" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Label" x="0" y="0" w="-1" h="-1" measuredW="49" measuredH="25" zOrder="0" locked="false" isInGroup="10">
+          <controlProperties>
+            <text>Picture</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="60" y="43" w="-1" h="-1" measuredW="104" measuredH="28" zOrder="1" locked="false" isInGroup="10">
+          <controlProperties>
+            <text>Take%20Picture</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Image" x="2" y="21" w="50" h="50" measuredW="77" measuredH="79" zOrder="2" locked="false" isInGroup="10"/>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="14" controlTypeID="__group__" x="443" y="433" w="141" h="28" measuredW="141" measuredH="28" zOrder="7" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="0" w="65" h="28" measuredW="54" measuredH="28" zOrder="0" locked="false" isInGroup="14">
+          <controlProperties>
+            <text>Save</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="76" y="0" w="-1" h="-1" measuredW="65" measuredH="28" zOrder="1" locked="false" isInGroup="14">
+          <controlProperties>
+            <text>Cancel</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Link" x="772" y="367" w="-1" h="-1" measuredW="169" measuredH="25" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>No%20Tag%20Associated.%20Help.</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Label" x="407" y="357" w="-1" h="-1" measuredW="62" measuredH="25" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>NFC%20Tag</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

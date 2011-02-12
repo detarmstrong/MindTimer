@@ -1,0 +1,39 @@
+<mockup version="1.0" skin="sketch" measuredW="908" measuredH="566" mockupW="282" mockupH="510">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::iPhone" x="626" y="56" w="-1" h="-1" measuredW="282" measuredH="510" zOrder="0" locked="false" isInGroup="-1"/>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::ButtonBar" x="661" y="200" w="211" h="39" measuredW="152" measuredH="31" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>1</selectedIndex>
+        <text>Hours%20%2CMinutes</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::DataGrid" x="661" y="243" w="211" h="176" measuredW="83" measuredH="182" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>none</borderStyle>
+        <hasHeader>false</hasHeader>
+        <rowHeight>44</rowHeight>
+        <selectedIndex>-1</selectedIndex>
+        <text>1%2C2%2C3%0A4%2C5%2C6%0A7%2C8%2C9%0A00%2C0%2C%3C%0A%7B8C%2C8C%2C8C%7D</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="__group__" x="667" y="429" w="201" h="43" measuredW="201" measuredH="43" zOrder="3" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="0" w="100" h="43" measuredW="65" measuredH="28" zOrder="0" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>Cancel</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="101" y="0" w="100" h="43" measuredW="54" measuredH="28" zOrder="1" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>Done</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Title" x="705" y="147" w="-1" h="-1" measuredW="120" measuredH="62" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>00%3A26</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>
