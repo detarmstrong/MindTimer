@@ -241,7 +241,7 @@ public class TimerEdit extends Activity {
 
     }
 
-    private String toColonFormat(String hours, String minutes) {
+    public static String toColonFormat(String hours, String minutes) {
 
         hours = pad(hours, "0", 2);
         minutes = pad(minutes, "0", 2);
@@ -249,7 +249,7 @@ public class TimerEdit extends Activity {
         return hours + ":" + minutes;
     }
 
-    protected String pad(String numberPart, String pad, int desiredWidth) {
+    protected static String pad(String numberPart, String pad, int desiredWidth) {
         // TODO fix me! I should use desiredWidth
         if (numberPart.length() == 1) {
             numberPart = "0" + numberPart;

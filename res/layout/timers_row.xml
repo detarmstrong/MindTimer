@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="55dp"
-	android:id="@+id/TimerLayout">
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:id="@+id/TimerLayout" android:paddingRight="6dp">
 
 	<ImageButton android:id="@+id/TimerImageButton"
-		android:layout_width="50dp" android:layout_height="50dp"
+		android:layout_width="65dp" android:layout_height="65dp"
 		android:src="@drawable/button_down" />
 
 	<TextView android:id="@+id/TimerLabel"
 		xmlns:android="http://schemas.android.com/apk/res/android"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/TimerImageButton" android:text="Static Text" />
+		android:layout_toRightOf="@id/TimerImageButton" android:text="Sample label text"
+		android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	<ImageButton android:src="@drawable/slowpoke_play_button" 
-        android:id="@+id/ToggleTimerOnOff"
-        android:layout_width="50dp" android:layout_height="50dp"         
-		android:layout_below="@id/TimerLabel" 
-		android:layout_alignParentRight="true" android:layout_alignParentTop="true" 
-		android:background="@drawable/button_layer_drawable"/>
 
-	<TextView android:text="0 mins" android:id="@+id/Duration"
-		android:layout_below="@id/TimerLabel" android:layout_toRightOf="@id/TimerImageButton"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+	<TextView android:text="00:00" android:id="@+id/Duration"
+		android:layout_alignParentRight="true" android:layout_alignParentTop="true"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_marginBottom="-4dp" />
 
+	<ImageButton android:id="@+id/ToggleTimerOnOff" android:src="@drawable/slowpoke_play_button"
+		 android:layout_width="40dp"
+		android:layout_height="40dp" android:layout_below="@id/Duration"
+		android:layout_alignRight="@id/Duration" android:background="@drawable/button_layer_drawable" />
+
+
+	<View android:id="@+id/progress_bar" android:layout_toLeftOf="@id/ToggleTimerOnOff"
+		android:layout_toRightOf="@id/TimeRemaining" android:layout_width="fill_parent"
+		android:layout_height="10dp" android:layout_alignBottom="@id/ToggleTimerOnOff"
+		android:background="@drawable/progress_bar"></View>
+
+	<TextView android:text="00:00" android:id="@+id/TimeRemaining"
+		android:layout_toRightOf="@id/TimerImageButton" 
+		android:layout_alignBottom="@id/progress_bar" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium"
+		android:drawablePadding="0dp" android:layout_marginBottom="-6dp" 
+		android:layout_marginRight="2dp" />
 </RelativeLayout>
