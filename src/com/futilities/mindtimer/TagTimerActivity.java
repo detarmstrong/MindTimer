@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -254,7 +255,9 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                 Toast.makeText(this, "Scan tag again to start timer",
                         Toast.LENGTH_LONG).show();
 
-                mDbHelper.update(timerId, mPayloadsRead.get(0));
+                ContentValues cv = new ContentValues(1);
+                cv.put(TimersDbAdapter.KEY_NFC_ID, mPayloadsRead.get(0));
+                mDbHelper.update(timerId, cv, "");
 
                 setResult(RESULT_OK);
                 finish();

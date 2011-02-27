@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -215,7 +216,9 @@ public class TimerEdit extends Activity {
                 forgetTag.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mDb.update(mTimerId, null);
+                    	ContentValues cv = new ContentValues();
+                    	cv.put(TimersDbAdapter.KEY_NFC_ID, "");
+                        mDb.update(mTimerId, cv, "");
 
                         Toast.makeText(getApplicationContext(),
                                 "NFC tag forgotten", Toast.LENGTH_SHORT).show();

@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
 
 public class MindTimerList extends ListActivity {
 	protected final static int ACTIVITY_CREATE = 1;
@@ -114,12 +115,16 @@ public class MindTimerList extends ListActivity {
 			case ACTIVITY_CREATE:
 				Log.i(TAG, "About to call requery");
 	
-				CursorAdapter adapter = (CursorAdapter) getListAdapter();
-				adapter.getCursor().requery(); // causes bindView() to run again
+				requery();
 				
 				break;
 			}
 		}
+	}
+
+	private void requery() {
+		CursorAdapter adapter = (CursorAdapter) getListAdapter();
+		adapter.getCursor().requery(); // causes bindView() to run again
 	}
 
 	public void toggleTimerState(long id) {
@@ -127,8 +132,7 @@ public class MindTimerList extends ListActivity {
 		
 		// set to running state
 		if(!mRunningTimers.containsKey(id)){
-			glass = new HourGlass(0, 0, 0);
-			
+			glass = new HourGlass(this, id, 0, 0, 0);
 			
 			// register listitemview for updates
 			mRunningTimers.put(id, glass);
@@ -139,7 +143,8 @@ public class MindTimerList extends ListActivity {
 		
 		glass.transitionTimerState();
 		
-
+		// Rebind views via requery, on rebinding views will have updating state
+		requery(); 
 		
 		if(mRunningTimers.size() > 0){
 			startElapsationTask();
@@ -169,13 +174,23 @@ public class MindTimerList extends ListActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            Set<Entry<Long, HourGlass>> set = mRunningTimers.entrySet();
-            Iterator<Entry<Long, HourGlass>> i = set.iterator();
-            while(i.hasNext()){
-            	Map.Entry me = (Map.Entry) i.next();
-            	HourGlass hg = (HourGlass) me.getValue();
-            	hg.updateElapsed();
-            }
+            // Update all visible views.
+    		ListView view = getListView();
+    		
+    		int first = view.getFirstVisiblePosition();
+    		int count = view.getChildCount();
+    		
+    		for (int i=0; i<count; i++) {
+    			MindTimerListItemView itemView = (MindTimerListItemView) view.getChildAt(i);
+    			
+    			long id = itemView.getId();
+    			
+    			HourGlass glass = mRunningTimers.get(id);
+    			TimerState state = glass.getTimerState();
+    			long secondsElapsed = glass.getSecondsElapsed();
+    			
+    			itemView.updateProgress(state, secondsElapsed);
+    		}
             
         }
     };

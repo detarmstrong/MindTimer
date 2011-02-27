@@ -161,16 +161,9 @@ public class TimersDbAdapter {
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 
-	public boolean update(long rowId, ContentValues contentValues) {
+	public boolean update(long rowId, ContentValues contentValues, String why) {
 		return mDb.update(DATABASE_TABLE, contentValues, KEY_ROWID + "="
 				+ rowId, null) > 0;
-	}
-
-	public boolean update(long rowId, String recordPayload) {
-		ContentValues args = new ContentValues();
-		args.put(KEY_NFC_ID, recordPayload);
-
-		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 
 	public long countAll() {
@@ -178,4 +171,5 @@ public class TimersDbAdapter {
 		SQLiteStatement sqlStatement = mDb.compileStatement(sql);
 		return sqlStatement.simpleQueryForLong();
 	}
+
 }
