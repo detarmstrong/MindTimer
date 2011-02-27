@@ -218,7 +218,7 @@ public class TimerEdit extends Activity {
                     public void onClick(View v) {
                     	ContentValues cv = new ContentValues();
                     	cv.put(TimersDbAdapter.KEY_NFC_ID, "");
-                        mDb.update(mTimerId, cv, "");
+                        mDb.update(mTimerId, cv);
 
                         Toast.makeText(getApplicationContext(),
                                 "NFC tag forgotten", Toast.LENGTH_SHORT).show();

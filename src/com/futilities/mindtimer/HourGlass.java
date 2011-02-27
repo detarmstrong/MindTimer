@@ -7,6 +7,7 @@ import android.util.Log;
 
 public class HourGlass {
 
+	private static final String TAG = "HOURGLASS";
 	private Context mContext;
 	private long mSecondsElapsed;
 	private long mRealtimeDeadline;
@@ -15,7 +16,7 @@ public class HourGlass {
 	private long mId;
 
 	public enum TimerState {
-		RUNNING, PAUSED, NOT_STARTED
+		RUNNING, NOT_STARTED
 	};
 
 	public HourGlass(Context context, long id, long elapsed, long deadline, long duration) {
@@ -25,12 +26,6 @@ public class HourGlass {
 		mRealtimeDeadline = deadline;
 		mSecondsDuration = duration;
 		setTimerState(TimerState.NOT_STARTED);
-	}
-
-	public void updateElapsed() {
-		mSecondsElapsed += 1000;
-		Log.i("HORUGLASS", "updateElapsedCalled, mElapsed = " + mSecondsElapsed);
-
 	}
 
 	public void setTimerState(TimerState timerState) {
@@ -48,30 +43,39 @@ public class HourGlass {
 	public TimerState transitionTimerState() {
 		TimerState startingTimerState = getTimerState();
 		TimerState resultingTimerState;
+		ContentValues cv;
+		TimersDbAdapter db = new TimersDbAdapter(mContext);
+		db.open();
 
 		switch (startingTimerState) {
 		case NOT_STARTED:
-			resultingTimerState = TimerState.RUNNING;
-			long elapsedRealtime = SystemClock.elapsedRealtime();
-			mRealtimeDeadline = (long) (elapsedRealtime + (mSecondsDuration - mSecondsElapsed) * 1000);
 			
-	        TimersDbAdapter db = new TimersDbAdapter(mContext);
-	        db.open();
+			Log.i(TAG, "go to RUNNING state");
+			resultingTimerState = TimerState.RUNNING;
+			
+			long elapsedRealtime = SystemClock.elapsedRealtime();
+			mRealtimeDeadline = (long) elapsedRealtime + (mSecondsDuration * 1000);
+			
 	        
-	        ContentValues cv = new ContentValues();
+	        cv = new ContentValues();
 	        cv.put(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT, mRealtimeDeadline);
 	        cv.put(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT, elapsedRealtime);
 	        
-	        db.update(mId, cv, "");
+	        db.update(mId, cv);
 	        
-	        db.close();
 	        
 	        // requery() called in MindTimerList updates views
 	        
 			break;
 
 		case RUNNING:
-			resultingTimerState = TimerState.PAUSED;
+			resultingTimerState = TimerState.NOT_STARTED;
+			
+			cv = new ContentValues();
+	        cv.put(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT, 0);
+	        cv.put(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT, 0);
+	        
+	        db.update(mId, cv);
 			
 			break;
 			
@@ -79,6 +83,8 @@ public class HourGlass {
 			resultingTimerState = TimerState.NOT_STARTED;
 		}
 
+		db.close();
+		
 		setTimerState(resultingTimerState);
 		
 		return resultingTimerState;
@@ -149,6 +155,8 @@ public class HourGlass {
 		sb.append(":");
 		if (seconds < 10) sb.append("0");
 		sb.append(seconds);
+		
+		Log.i(TAG, sb.toString());
 		
 		return sb.toString();
 	}

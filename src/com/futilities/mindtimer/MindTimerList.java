@@ -31,7 +31,7 @@ public class MindTimerList extends ListActivity {
 	protected final static int ACTIVITY_EDIT = 0;
 	private static final String TAG = "MINDTIMERLIST";
 	private final int INSERT_ID = 1;
-	private TimersDbAdapter mDbHelper;
+	private TimersDbAdapter mDbAdapter;
 	private MindTimerCursorAdapter mCursorAdapter;
 	private HashMap<Long, HourGlass> mRunningTimers;
 	private Timer mTimer;
@@ -43,16 +43,16 @@ public class MindTimerList extends ListActivity {
 
 		setContentView(R.layout.timers_list);
 
-		mDbHelper = new TimersDbAdapter(this);
-		mDbHelper.open();
+		initDbAdapter();
 
-		Cursor cursor = mDbHelper.fetchAll();
+		Cursor cursor = mDbAdapter.fetchAll();
 
 		mCursorAdapter = new MindTimerCursorAdapter(this, cursor);
 
 		setListAdapter(mCursorAdapter);
-		
-		
+
+		initElapsationTask();
+
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class MindTimerList extends ListActivity {
 
 		Log.i("mindtimer", "in onPause");
 
-		// TODO unregister handlers for updating ui
+		stopElapsationTask();
 
 	}
 
@@ -71,14 +71,26 @@ public class MindTimerList extends ListActivity {
 
 		Log.i("MindTimer", "in onStop");
 
+		mDbAdapter.close();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		//TODO load running timers
+		mTimer = null;
+		initElapsationTask();
+		startElapsationTask();
+		
+		initDbAdapter();
+
+		// TODO lookup running timers in db
 		mRunningTimers = new HashMap<Long, HourGlass>();
+	}
+
+	private void initDbAdapter() {
+		mDbAdapter = new TimersDbAdapter(this);
+		mDbAdapter.open();		
 	}
 
 	@Override
@@ -87,7 +99,7 @@ public class MindTimerList extends ListActivity {
 		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
@@ -109,14 +121,18 @@ public class MindTimerList extends ListActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
-		if(resultCode == RESULT_OK){
+		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
 			case ACTIVITY_EDIT:
 			case ACTIVITY_CREATE:
 				Log.i(TAG, "About to call requery");
-	
-				requery();
 				
+				// For some reason onCreate is not called before this;
+				// so the db adapter isn't open
+				mDbAdapter.open();
+
+				requery();
+
 				break;
 			}
 		}
@@ -124,75 +140,78 @@ public class MindTimerList extends ListActivity {
 
 	private void requery() {
 		CursorAdapter adapter = (CursorAdapter) getListAdapter();
-		adapter.getCursor().requery(); // causes bindView() to run again
+		
+		Cursor cursor = mDbAdapter.fetchAll();
+		adapter.changeCursor(cursor);
+		
+		adapter.notifyDataSetChanged();
 	}
 
-	public void toggleTimerState(long id) {
+	public void toggleTimerState(long id, int secondsDuration) {
 		HourGlass glass;
-		
+
+		Log.i(TAG, "in toggleTimerState " + id);
+
 		// set to running state
-		if(!mRunningTimers.containsKey(id)){
-			glass = new HourGlass(this, id, 0, 0, 0);
-			
-			// register listitemview for updates
+		if (!mRunningTimers.containsKey(id)) {
+			glass = new HourGlass(this, id, 0, 0, secondsDuration);
+
 			mRunningTimers.put(id, glass);
-		}
-		else {
+		} else {
 			glass = mRunningTimers.get(id);
 		}
-		
+
 		glass.transitionTimerState();
-		
+
 		// Rebind views via requery, on rebinding views will have updating state
-		requery(); 
-		
-		if(mRunningTimers.size() > 0){
-			startElapsationTask();
-		}
-		
+		requery();
+
 	}
 
-	// If any active timers, then this should kick off the timer task
-	private void startElapsationTask() {
-		
+	private void initElapsationTask() {
 		// foreground UI updates depend on this timer thread
-        mTimer = new Timer();
-        mElapsationTask = new ElapsationTask();
-        mTimer.schedule(mElapsationTask, 1000, 1000);
-		
+		mTimer = new Timer();
+		mElapsationTask = new ElapsationTask();
+
 	}
-	
-    private class ElapsationTask extends TimerTask {
-        public void run() {
-            mUiUpdateHandler.sendMessage(mUiUpdateHandler.obtainMessage(0));
 
-        }
-    }
+	private void startElapsationTask() {
+		mTimer.schedule(mElapsationTask, 1000, 1000);
 
-    private Handler mUiUpdateHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
+	}
 
-            // Update all visible views.
-    		ListView view = getListView();
-    		
-    		int first = view.getFirstVisiblePosition();
-    		int count = view.getChildCount();
-    		
-    		for (int i=0; i<count; i++) {
-    			MindTimerListItemView itemView = (MindTimerListItemView) view.getChildAt(i);
-    			
-    			long id = itemView.getId();
-    			
-    			HourGlass glass = mRunningTimers.get(id);
-    			TimerState state = glass.getTimerState();
-    			long secondsElapsed = glass.getSecondsElapsed();
-    			
-    			itemView.updateProgress(state, secondsElapsed);
-    		}
-            
-        }
-    };
+	private void stopElapsationTask() {
+		mTimer.cancel();
+		mTimer.purge();
+
+	}
+
+	private class ElapsationTask extends TimerTask {
+		public void run() {
+			mUiUpdateHandler.sendMessage(mUiUpdateHandler.obtainMessage(0));
+
+		}
+	}
+
+	private Handler mUiUpdateHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+
+			// Update all visible views.
+			ListView view = getListView();
+
+			int first = view.getFirstVisiblePosition();
+			int count = view.getChildCount();
+
+			for (int i = 0; i < count; i++) {
+				MindTimerListItemView itemView = (MindTimerListItemView) view
+						.getChildAt(first + i);
+
+				itemView.updateProgress();
+			}
+
+		}
+	};
 
 }

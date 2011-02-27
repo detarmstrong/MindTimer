@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,7 +28,7 @@ public class MindTimerListItemView extends LinearLayout implements
 	private TextView mLabelView;
 	private ImageButton mTimerControlButton;
 	private RelativeLayout mThisView;
-	private long mId;
+	private long mTimerId;
 	private TextView mDurationLabelView;
 	private ImageButton mTimerIconView;
 	private Object mThisTimer;
@@ -34,6 +36,8 @@ public class MindTimerListItemView extends LinearLayout implements
 	private TimerState mTimerState;
 	private TextView mTimeRemainingView;
 	private long mSecondsElapsed;
+	private int mSecondsDuration;
+	private View mProgressBar;
 
 	public MindTimerListItemView(Context context) {
 		super(context);
@@ -49,10 +53,10 @@ public class MindTimerListItemView extends LinearLayout implements
 		mTimeRemainingView = (TextView) findViewById(R.id.TimeRemaining);
 		mTimerIconView = (ImageButton) findViewById(R.id.TimerImageButton);
 		mTimerControlButton = (ImageButton) findViewById(R.id.ToggleTimerOnOff);
+		mProgressBar = findViewById(R.id.progress_bar);
 		mTimerState = TimerState.NOT_STARTED;
-		
+
 		mThisView = (RelativeLayout) findViewById(R.id.TimerLayout);
-		
 
 	}
 
@@ -64,8 +68,12 @@ public class MindTimerListItemView extends LinearLayout implements
 		mTimerState = timerState;
 	}
 
-	public void setId(long id) {
-		mId = id;
+	public void setTimerId(long id) {
+		mTimerId = id;
+	}
+
+	public long getTimerId() {
+		return mTimerId;
 	}
 
 	public void setLabel(String label) {
@@ -89,23 +97,27 @@ public class MindTimerListItemView extends LinearLayout implements
 		mDeadline = deadline;
 	}
 
+	public void setSecondsDuration(int secondsDuration) {
+		mSecondsDuration = secondsDuration;
+
+	}
+
 	@Override
 	public void onClick(View v) {
-		Log.i(TAG, v.toString());
 
 		// TODO also go edit if the timer label is clicked
 		if (mTimerIconView == v) {
 			Log.i(TAG, "timer icon clicked");
 			Intent i = new Intent(mContext, TimerEdit.class);
-			i.putExtra(TimersDbAdapter.KEY_ROWID, mId);
+			i.putExtra(TimersDbAdapter.KEY_ROWID, mTimerId);
 			((MindTimerList) mContext).startActivityForResult(i,
 					MindTimerList.ACTIVITY_EDIT);
 
 		} else if (mTimerControlButton == v) {
-			Log.i(TAG, "play button clicked");
+			Log.i(TAG, "play button clicked " + mTimerId);
 
 			MindTimerList list = (MindTimerList) mContext;
-			list.toggleTimerState(mId);
+			list.toggleTimerState(mTimerId, mSecondsDuration);
 		}
 
 	}
@@ -119,22 +131,45 @@ public class MindTimerListItemView extends LinearLayout implements
 		mTimerControlButton.setOnClickListener(this);
 	}
 
-	public void updateProgress(TimerState state, long secondsElapsed) {
+	public void updateProgress() {
 		long delta = mDeadline - SystemClock.elapsedRealtime();
-		mTimerState = state;
-		mSecondsElapsed = secondsElapsed;
-		
-		switch(state){
+		mSecondsElapsed = delta / 1000;
+
+		switch (mTimerState) {
 		case RUNNING:
+			mTimerControlButton
+					.setImageResource(R.drawable.slowpoke_pause_button);
+			
 			mTimeRemainingView.setText(HourGlass.getDurationString(delta));
+			
+			// get width of progress_bar
+			// get percentage completion of timer
+			// get that percentage of width of progress bar
+			// add that amount in px! to the left margin of TimeRemaining
+			int progressBarPxWidth = mProgressBar.getMeasuredWidth();
+			Log.i(TAG, "Timer " + mTimerId + ": progressBarWidthPx = "
+					+ progressBarPxWidth);
+
+			float completeRatio = ((float) mSecondsElapsed / mSecondsDuration);
+			Log.i(TAG, "Timer " + mTimerId + ": completeRatio " + completeRatio
+					+ " : " + mSecondsElapsed + " / " + mSecondsDuration);
+
+			float adjustmentPxs = completeRatio * progressBarPxWidth;
+			Log.i(TAG, "Timer " + mTimerId + ": adjPixs " + adjustmentPxs);
+
+			ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) mTimeRemainingView
+					.getLayoutParams();
+
+			mlp.setMargins((int) (progressBarPxWidth - adjustmentPxs), 0, 0, 0);
+
 			break;
 		case NOT_STARTED:
-			break;
-		case PAUSED:
-			mTimerControlButton.setImageResource(R.drawable.slowpoke_pause_button);
+			mTimeRemainingView.setText(HourGlass.getDurationString(0));
+			mTimerControlButton
+					.setImageResource(R.drawable.slowpoke_play_button);
 			break;
 		}
-		
+
 	}
 
 }

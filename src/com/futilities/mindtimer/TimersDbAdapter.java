@@ -99,7 +99,7 @@ public class TimersDbAdapter {
 				KEY_SECONDS, KEY_STARTED_AT_MILLIS_SINCE_BOOT,
 				KEY_DEADLINE_MILLIS_SINCE_BOOT, KEY_MINUTE_LABEL,
 				KEY_HOUR_LABEL, KEY_THUMBNAIL_ABSOLUTE_PATH }, null, null,
-				null, null, null);
+				null, null, KEY_ROWID);
 	}
 
 	public Cursor fetchOne(long rowId) throws SQLException {
@@ -161,7 +161,7 @@ public class TimersDbAdapter {
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 
-	public boolean update(long rowId, ContentValues contentValues, String why) {
+	public boolean update(long rowId, ContentValues contentValues) {
 		return mDb.update(DATABASE_TABLE, contentValues, KEY_ROWID + "="
 				+ rowId, null) > 0;
 	}

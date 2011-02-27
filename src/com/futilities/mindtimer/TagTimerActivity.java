@@ -257,7 +257,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
                 ContentValues cv = new ContentValues(1);
                 cv.put(TimersDbAdapter.KEY_NFC_ID, mPayloadsRead.get(0));
-                mDbHelper.update(timerId, cv, "");
+                mDbHelper.update(timerId, cv);
 
                 setResult(RESULT_OK);
                 finish();
