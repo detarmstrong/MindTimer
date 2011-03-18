@@ -1,11 +1,6 @@
 package com.futilities.mindtimer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,12 +12,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
@@ -33,7 +25,6 @@ public class MindTimerList extends ListActivity {
 	private final int INSERT_ID = 1;
 	private TimersDbAdapter mDbAdapter;
 	private MindTimerCursorAdapter mCursorAdapter;
-	private HashMap<Long, HourGlass> mRunningTimers;
 	private Timer mTimer;
 	private ElapsationTask mElapsationTask;
 
@@ -84,8 +75,6 @@ public class MindTimerList extends ListActivity {
 		
 		initDbAdapter();
 
-		// TODO lookup running timers in db
-		mRunningTimers = new HashMap<Long, HourGlass>();
 	}
 
 	private void initDbAdapter() {
@@ -138,34 +127,13 @@ public class MindTimerList extends ListActivity {
 		}
 	}
 
-	private void requery() {
+	void requery() {
 		CursorAdapter adapter = (CursorAdapter) getListAdapter();
 		
 		Cursor cursor = mDbAdapter.fetchAll();
 		adapter.changeCursor(cursor);
 		
 		adapter.notifyDataSetChanged();
-	}
-
-	public void toggleTimerState(long id, int secondsDuration) {
-		HourGlass glass;
-
-		Log.i(TAG, "in toggleTimerState " + id);
-
-		// set to running state
-		if (!mRunningTimers.containsKey(id)) {
-			glass = new HourGlass(this, id, 0, 0, secondsDuration);
-
-			mRunningTimers.put(id, glass);
-		} else {
-			glass = mRunningTimers.get(id);
-		}
-
-		glass.transitionTimerState();
-
-		// Rebind views via requery, on rebinding views will have updating state
-		requery();
-
 	}
 
 	private void initElapsationTask() {
@@ -208,10 +176,14 @@ public class MindTimerList extends ListActivity {
 				MindTimerListItemView itemView = (MindTimerListItemView) view
 						.getChildAt(first + i);
 
-				itemView.updateProgress();
+				if(itemView != null){
+					itemView.updateProgress();
+				}
+					
 			}
 
 		}
 	};
+
 
 }

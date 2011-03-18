@@ -8,8 +8,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.NdefMessage;
@@ -80,8 +78,6 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
             NdefRecord[] records = msgs[0].getRecords();
 
-            // Use the payload to identify the records. getId() is
-            // non-deterministic
             mPayloadsRead = new ArrayList<String>();
 
             for (NdefRecord record : records) {
@@ -180,7 +176,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
         content.removeAllViews();
 
         // get cursor for all timers without tags
-        Cursor timersCursor = mDbHelper.fetchWhere(mDbHelper.KEY_NFC_ID
+        Cursor timersCursor = mDbHelper.fetchWhere(TimersDbAdapter.KEY_NFC_ID
                 + " IS NULL");
         startManagingCursor(timersCursor);
 

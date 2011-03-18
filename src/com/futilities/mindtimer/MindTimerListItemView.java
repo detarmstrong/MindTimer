@@ -1,8 +1,7 @@
 package com.futilities.mindtimer;
 
 import java.io.File;
-
-import com.futilities.mindtimer.HourGlass.TimerState;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,11 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.futilities.mindtimer.HourGlass.TimerState;
 
 public class MindTimerListItemView extends LinearLayout implements
 		OnClickListener {
@@ -27,17 +26,16 @@ public class MindTimerListItemView extends LinearLayout implements
 	private Context mContext;
 	private TextView mLabelView;
 	private ImageButton mTimerControlButton;
-	private RelativeLayout mThisView;
 	private long mTimerId;
 	private TextView mDurationLabelView;
 	private ImageButton mTimerIconView;
-	private Object mThisTimer;
 	private long mDeadline;
 	private TimerState mTimerState;
 	private TextView mTimeRemainingView;
-	private long mSecondsElapsed;
+	private long mDeltaSeconds;
 	private int mSecondsDuration;
 	private View mProgressBar;
+	private int mStartingProgressBarWidth;
 
 	public MindTimerListItemView(Context context) {
 		super(context);
@@ -56,8 +54,6 @@ public class MindTimerListItemView extends LinearLayout implements
 		mProgressBar = findViewById(R.id.progress_bar);
 		mTimerState = TimerState.NOT_STARTED;
 
-		mThisView = (RelativeLayout) findViewById(R.id.TimerLayout);
-
 	}
 
 	public TimerState getTimerState() {
@@ -65,6 +61,8 @@ public class MindTimerListItemView extends LinearLayout implements
 	}
 
 	public void setTimerState(TimerState timerState) {
+		MindTimerList list = (MindTimerList) mContext;
+		list.setTimerState(mTimerId, timerState);
 		mTimerState = timerState;
 	}
 
@@ -90,6 +88,9 @@ public class MindTimerListItemView extends LinearLayout implements
 		if (file.exists()) {
 			Bitmap bm = BitmapFactory.decodeFile(thumbnailFilePath);
 			mTimerIconView.setImageBitmap(bm);
+		} else {
+			mTimerIconView.setImageDrawable(getResources().getDrawable(
+					R.drawable.button_down));
 		}
 	}
 
@@ -104,8 +105,6 @@ public class MindTimerListItemView extends LinearLayout implements
 
 	@Override
 	public void onClick(View v) {
-
-		// TODO also go edit if the timer label is clicked
 		if (mTimerIconView == v) {
 			Log.i(TAG, "timer icon clicked");
 			Intent i = new Intent(mContext, TimerEdit.class);
@@ -117,7 +116,16 @@ public class MindTimerListItemView extends LinearLayout implements
 			Log.i(TAG, "play button clicked " + mTimerId);
 
 			MindTimerList list = (MindTimerList) mContext;
-			list.toggleTimerState(mTimerId, mSecondsDuration);
+
+			MindTimerCursorAdapter adapter = (MindTimerCursorAdapter) list
+					.getListAdapter();
+			
+			HashMap<Long, HourGlass> glasses = adapter.getRunningTimers();
+			TimerState newState = glasses.get(mTimerId).transitionTimerState();
+			
+			setTimerState(newState);
+
+			list.requery();
 		}
 
 	}
@@ -132,41 +140,53 @@ public class MindTimerListItemView extends LinearLayout implements
 	}
 
 	public void updateProgress() {
-		long delta = mDeadline - SystemClock.elapsedRealtime();
-		mSecondsElapsed = delta / 1000;
+		// If the app is stopped and resumed, the deadline in the db may be in
+		// the past
+		long delta = Math.max(mDeadline - SystemClock.elapsedRealtime(), 0);
+		mDeltaSeconds = delta / 1000;
+
+		ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) mTimeRemainingView
+				.getLayoutParams();
 
 		switch (mTimerState) {
 		case RUNNING:
+			if (mSecondsDuration <= 0) {
+				return;
+			}
+
 			mTimerControlButton
-					.setImageResource(R.drawable.slowpoke_pause_button);
-			
+					.setImageResource(R.drawable.slowpoke_stop_button);
+
 			mTimeRemainingView.setText(HourGlass.getDurationString(delta));
-			
-			// get width of progress_bar
-			// get percentage completion of timer
-			// get that percentage of width of progress bar
-			// add that amount in px! to the left margin of TimeRemaining
-			int progressBarPxWidth = mProgressBar.getMeasuredWidth();
-			Log.i(TAG, "Timer " + mTimerId + ": progressBarWidthPx = "
-					+ progressBarPxWidth);
 
-			float completeRatio = ((float) mSecondsElapsed / mSecondsDuration);
-			Log.i(TAG, "Timer " + mTimerId + ": completeRatio " + completeRatio
-					+ " : " + mSecondsElapsed + " / " + mSecondsDuration);
+			mStartingProgressBarWidth = Math.max(
+					mProgressBar.getMeasuredWidth(), mStartingProgressBarWidth);
 
-			float adjustmentPxs = completeRatio * progressBarPxWidth;
-			Log.i(TAG, "Timer " + mTimerId + ": adjPixs " + adjustmentPxs);
+			// Use the left margin of the time remaining text to affect the
+			// width of the progress bar
+			int newProgressBarWidth = (int) ((mDeltaSeconds * mStartingProgressBarWidth) / mSecondsDuration);
 
-			ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) mTimeRemainingView
-					.getLayoutParams();
+			mlp.setMargins(
+					(int) (mStartingProgressBarWidth - newProgressBarWidth),
+					mlp.topMargin, mlp.rightMargin, mlp.bottomMargin);
 
-			mlp.setMargins((int) (progressBarPxWidth - adjustmentPxs), 0, 0, 0);
+			if (delta <= 0) {
+				setTimerState(HourGlass.TimerState.FINISHED);
+
+			}
 
 			break;
 		case NOT_STARTED:
 			mTimeRemainingView.setText(HourGlass.getDurationString(0));
 			mTimerControlButton
 					.setImageResource(R.drawable.slowpoke_play_button);
+
+			mlp.setMargins(0, mlp.topMargin, mlp.rightMargin, mlp.bottomMargin);
+			break;
+
+		case FINISHED:
+			mTimerControlButton
+					.setImageResource(R.drawable.slowpoke_pause_button);
 			break;
 		}
 

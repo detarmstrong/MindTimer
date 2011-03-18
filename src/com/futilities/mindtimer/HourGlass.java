@@ -1,7 +1,11 @@
 package com.futilities.mindtimer;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -16,7 +20,7 @@ public class HourGlass {
 	private long mId;
 
 	public enum TimerState {
-		RUNNING, NOT_STARTED
+		RUNNING, NOT_STARTED, FINISHED
 	};
 
 	public HourGlass(Context context, long id, long elapsed, long deadline, long duration) {
@@ -69,6 +73,7 @@ public class HourGlass {
 			break;
 
 		case RUNNING:
+		case FINISHED:
 			resultingTimerState = TimerState.NOT_STARTED;
 			
 			cv = new ContentValues();
@@ -159,5 +164,37 @@ public class HourGlass {
 		Log.i(TAG, sb.toString());
 		
 		return sb.toString();
+	}
+	
+	public static void setAlarm(Context context, Uri uri, long time) {
+		PendingIntent pendingIntent = getAlarmPendingIntent(context, uri);
+
+		// Schedule the alarm!
+		AlarmManager am = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+	}
+
+	public static void cancelAlarm(Context context, Uri uri) {
+		PendingIntent pendingIntent = getAlarmPendingIntent(context, uri);
+
+		// Cancel the alarm!
+		AlarmManager am = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+		am.cancel(pendingIntent);
+	}
+
+	/**
+	 * Get the pending intent for setting or canceling the alarm.
+	 */
+	public static PendingIntent getAlarmPendingIntent(Context context, Uri uri) {
+		Intent intent = new Intent(context, MindTimerAlarmReceiver.class);
+
+		intent.setData(uri);
+
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+				intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+		return pendingIntent;
 	}
 }

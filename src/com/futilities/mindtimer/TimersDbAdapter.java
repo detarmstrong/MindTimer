@@ -30,7 +30,7 @@ public class TimersDbAdapter {
 	private class DatabaseHelper extends SQLiteOpenHelper {
 
 		private static final String DATABASE_NAME = "mind_timer_data";
-		private static final int DATABASE_VERSION = 14;
+		private static final int DATABASE_VERSION = 16;
 
 		DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);

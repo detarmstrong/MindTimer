@@ -1,6 +1,6 @@
 package com.futilities.mindtimer;
 
-import com.futilities.mindtimer.HourGlass.TimerState;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,11 +11,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
+import com.futilities.mindtimer.HourGlass.TimerState;
+
 public class MindTimerCursorAdapter extends CursorAdapter {
 
 	private static final String TAG = "MINDTIMERCURSORADAPTER";
 	private Context mContext;
-	private OnClickListener mListener;
+	private HashMap<Long, HourGlass> mRunningTimers = new HashMap<Long, HourGlass>();
 
 	public MindTimerCursorAdapter(Context context, Cursor c) {
 		super(context, c);
@@ -25,7 +27,8 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		Log.i(TAG, "in BindView");
+		Log.i(TAG, "in BindView for cursor "+ cursor);
+		Log.i(TAG, "cursor position: " + cursor.getPosition());
 		
 		MindTimerListItemView rowLayout = (MindTimerListItemView) view;
 
@@ -65,7 +68,13 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 		rowLayout.setLabel(label);
 		rowLayout.setDurationLabel(formattedDuration);
 		rowLayout.setSecondsDuration(secondsDuration);
+		
+		if((thumbnailFilePath == null) || (thumbnailFilePath != null && thumbnailFilePath == "null")){
+			thumbnailFilePath = "";
+		}
+		
 		rowLayout.setThumbnail(thumbnailFilePath);
+		Log.i(TAG, "setting thumbnail " + thumbnailFilePath);
 		
 		rowLayout.setDeadline(deadline);
 
@@ -74,9 +83,17 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 		rowLayout.setTimerControlClickListener();
 		
 		TimerState state = TimerState.NOT_STARTED;
-		long elapsedSeconds = (SystemClock.elapsedRealtime() - startedAtMillisSinceBoot) * 1000;
-		if(startedAtMillisSinceBoot > 0){
+		if(deadline > SystemClock.elapsedRealtime()){
 			state = TimerState.RUNNING;
+		}
+		else if(deadline > 0){
+			state = TimerState.FINISHED;
+		}
+		
+		if (!mRunningTimers.containsKey(id)) {
+			HourGlass glass = new HourGlass(mContext, id, 0, 0, secondsDuration);
+			glass.setTimerState(state);
+			mRunningTimers.put(id, glass);
 		}
 		
 		rowLayout.setTimerState(state);
@@ -88,6 +105,10 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		return new MindTimerListItemView(context);
+	}
+	
+	public HashMap<Long, HourGlass> getRunningTimers() {
+		return mRunningTimers;
 	}
 
 	// Commented because requery() causes bindView(), which updates views

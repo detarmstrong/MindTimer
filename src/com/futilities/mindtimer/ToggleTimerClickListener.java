@@ -131,7 +131,7 @@ public class ToggleTimerClickListener implements OnClickListener {
     public void transitionToPauseState() {
         AlarmManager am = (AlarmManager) mCtx
                 .getSystemService(Activity.ALARM_SERVICE);
-        Intent intent = new Intent(mCtx, MindTimerAlarm.class);
+        Intent intent = new Intent(mCtx, MindTimerAlarmReceiver.class);
         intent.putExtra("timerId", (int) mId);
         PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -166,7 +166,7 @@ public class ToggleTimerClickListener implements OnClickListener {
         if(!resumeBackgroundActive){// then AlarmManager already running            
             AlarmManager am = (AlarmManager) mCtx
                     .getSystemService(Activity.ALARM_SERVICE);
-            Intent intent = new Intent(mCtx, MindTimerAlarm.class);
+            Intent intent = new Intent(mCtx, MindTimerAlarmReceiver.class);
             intent.putExtra("timerId", (int) mId);
             PendingIntent sender = PendingIntent.getBroadcast(mCtx, 0, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);

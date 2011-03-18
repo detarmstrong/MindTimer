@@ -61,7 +61,6 @@ public class TimerEdit extends Activity {
         setTitle(R.string.edit_timer);
         
         mLabelText = (TextView) findViewById(R.id.LabelEdit);
-        mIntervalText = (TextView) findViewById(R.id.Interval2);
         mTimerIconView = (ImageButton) findViewById(R.id.TimerIcon);
 
         // get timer id from savedInstanceState
@@ -74,13 +73,35 @@ public class TimerEdit extends Activity {
             mTimerId = (extras != null) ? extras
                     .getLong(TimersDbAdapter.KEY_ROWID) : null;
         }
+        
+        
+        mIntervalText = (TextView) findViewById(R.id.Interval2);
+        String intervalText = (savedInstanceState == null) ? null
+        		: (String) savedInstanceState
+        			.getString("intervalText");
+        
+        if(intervalText != null){
+        	mIntervalText.setText(intervalText);
+        }
+        
+        mHourPart = (savedInstanceState == null) ? "0"
+        		: (String) savedInstanceState
+        			.getString("hourPart");
+        mHourPart = (mHourPart == null) ? "0" : mHourPart;
 
+        mMinutePart = (savedInstanceState == null) ? "0"
+        		: (String) savedInstanceState
+        		.getString("minutePart");
+        mMinutePart = (mMinutePart == null) ? "0" : mMinutePart;
+        
         populateFields();
-
+        
         Button saveButton = (Button) findViewById(R.id.SaveEdit);
         saveButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
+            	saveState();
+            	
                 setResult(RESULT_OK);
                 finish();
 
@@ -217,7 +238,7 @@ public class TimerEdit extends Activity {
                     @Override
                     public void onClick(View v) {
                     	ContentValues cv = new ContentValues();
-                    	cv.put(TimersDbAdapter.KEY_NFC_ID, "");
+                    	cv.putNull(TimersDbAdapter.KEY_NFC_ID);
                         mDb.update(mTimerId, cv);
 
                         Toast.makeText(getApplicationContext(),
@@ -268,7 +289,7 @@ public class TimerEdit extends Activity {
         Log.v(TAG, "in onPause");
 
         if (!mResultCanceled) {
-            saveState();
+            //saveState();
         }
     }
 
@@ -366,10 +387,6 @@ public class TimerEdit extends Activity {
                     hourLabel, mThumbnailAbsolutePath);
 
         } else {
-            if (mThumbnailAbsolutePath.isEmpty())
-                Toast.makeText(this, mThumbnailAbsolutePath, Toast.LENGTH_SHORT)
-                        .show();
-
             mDb.update(mTimerId, label, intervalSeconds, minuteLabel,
                     hourLabel, mThumbnailAbsolutePath);
         }
@@ -381,9 +398,6 @@ public class TimerEdit extends Activity {
         startActivityForResult(intent, TAKE_PICTURE);
     }
 
-    // If back button clicked, don't save the contents of the form when
-    // saveState() is
-    // is called in onPause()
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
@@ -392,5 +406,16 @@ public class TimerEdit extends Activity {
 
         return super.onKeyDown(keyCode, event);
     }
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		outState.putString("intervalText", (String) mIntervalText.getText());
+		outState.putString("hourPart", mHourPart);
+		outState.putString("minutePart", mMinutePart);
+		super.onSaveInstanceState(outState);
+	}
+    
+    
 
 }
