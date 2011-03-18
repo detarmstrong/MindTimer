@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.SystemClock;
+import android.text.TextUtils.TruncateAt;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,7 @@ public class MindTimerListItemView extends LinearLayout implements
 		inflater.inflate(R.layout.timers_row, this, true);
 
 		mLabelView = (TextView) findViewById(R.id.TimerLabel);
+		mLabelView.setEllipsize(TruncateAt.MIDDLE);
 		mDurationLabelView = (TextView) findViewById(R.id.Duration);
 		mTimeRemainingView = (TextView) findViewById(R.id.TimeRemaining);
 		mTimerIconView = (ImageButton) findViewById(R.id.TimerImageButton);
@@ -61,8 +63,10 @@ public class MindTimerListItemView extends LinearLayout implements
 	}
 
 	public void setTimerState(TimerState timerState) {
-		MindTimerList list = (MindTimerList) mContext;
-		list.setTimerState(mTimerId, timerState);
+		// This code is broken because setTimerState doesn't exist on MindTimerList
+		// Trying to figure out if it went missing from TagTimerActivity
+		//MindTimerList list = (MindTimerList) mContext;
+		//list.setTimerState(mTimerId, timerState);
 		mTimerState = timerState;
 	}
 

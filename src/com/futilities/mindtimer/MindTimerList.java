@@ -1,10 +1,7 @@
 package com.futilities.mindtimer;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.futilities.mindtimer.HourGlass.TimerState;
 
 import android.app.ListActivity;
 import android.content.Intent;
