@@ -12,6 +12,8 @@ import android.util.Log;
 public class HourGlass {
 
 	private static final String TAG = "HOURGLASS";
+	private static final String AUTHORITY = "com.futilties.mindtimer";
+	private static final String PATH = "timers";
 	private Context mContext;
 	private long mSecondsElapsed;
 	private long mRealtimeDeadline;
@@ -59,20 +61,22 @@ public class HourGlass {
 			
 			long elapsedRealtime = SystemClock.elapsedRealtime();
 			mRealtimeDeadline = (long) elapsedRealtime + (mSecondsDuration * 1000);
+
+			setAlarm(mContext, mId, mRealtimeDeadline);
 			
-	        
 	        cv = new ContentValues();
 	        cv.put(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT, mRealtimeDeadline);
 	        cv.put(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT, elapsedRealtime);
 	        
 	        db.update(mId, cv);
 	        
-	        
-	        // requery() called in MindTimerList updates views
-	        
 			break;
 
 		case RUNNING:
+			cancelAlarm(mContext, mId);
+			
+			// falling through, little boy blue
+			
 		case FINISHED:
 			resultingTimerState = TimerState.NOT_STARTED;
 			
@@ -81,6 +85,8 @@ public class HourGlass {
 	        cv.put(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT, 0);
 	        
 	        db.update(mId, cv);
+	        
+	        // AlarmManager cancels itself
 			
 			break;
 			
@@ -161,22 +167,20 @@ public class HourGlass {
 		if (seconds < 10) sb.append("0");
 		sb.append(seconds);
 		
-		Log.i(TAG, sb.toString());
-		
 		return sb.toString();
 	}
 	
-	public static void setAlarm(Context context, Uri uri, long time) {
-		PendingIntent pendingIntent = getAlarmPendingIntent(context, uri);
+	public static void setAlarm(Context context, Long timerId, long time) {
+		PendingIntent pendingIntent = getAlarmPendingIntent(context, timerId);
 
 		// Schedule the alarm!
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+		am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, time, pendingIntent);
 	}
 
-	public static void cancelAlarm(Context context, Uri uri) {
-		PendingIntent pendingIntent = getAlarmPendingIntent(context, uri);
+	public static void cancelAlarm(Context context, Long timerId) {
+		PendingIntent pendingIntent = getAlarmPendingIntent(context, timerId);
 
 		// Cancel the alarm!
 		AlarmManager am = (AlarmManager) context
@@ -187,10 +191,13 @@ public class HourGlass {
 	/**
 	 * Get the pending intent for setting or canceling the alarm.
 	 */
-	public static PendingIntent getAlarmPendingIntent(Context context, Uri uri) {
+	public static PendingIntent getAlarmPendingIntent(Context context, Long timerId) {
 		Intent intent = new Intent(context, MindTimerAlarmReceiver.class);
 
+		Uri uri = Uri.parse("content://" + AUTHORITY + "/" + PATH + "/" + timerId);
+		
 		intent.setData(uri);
+		intent.putExtra("timerId", timerId);
 
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
 				intent, PendingIntent.FLAG_CANCEL_CURRENT);

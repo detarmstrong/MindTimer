@@ -102,6 +102,9 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             if (foundByPayload0.getCount() > 0) {
                 foundByPayload0.moveToFirst();
 
+                Long timerId = foundByPayload0.getLong(foundByPayload0
+            			.getColumnIndexOrThrow(TimersDbAdapter.KEY_ROWID));
+                
                 String timerLabel = foundByPayload0.getString(foundByPayload0
                         .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL));
 
@@ -145,7 +148,14 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
                 // TODO broadcast message to start timer (doesn't launch timer list,
                 // just sets the notification and starts manager, headless
-
+                
+                //TODO Broadcast intent OR explicitly launch intent?
+                Intent wantTimerStarted = new Intent(this, MindTimerList.class);
+                wantTimerStarted.putExtra(TimersDbAdapter.KEY_ROWID, timerId);
+                startActivity(wantTimerStarted);
+                
+                Log.v(TAG, "After startActivity; now set result");
+                
                 setResult(RESULT_OK);
                 finish();
 

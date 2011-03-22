@@ -124,11 +124,9 @@ public class MindTimerListItemView extends LinearLayout implements
 			MindTimerCursorAdapter adapter = (MindTimerCursorAdapter) list
 					.getListAdapter();
 			
-			HashMap<Long, HourGlass> glasses = adapter.getRunningTimers();
-			TimerState newState = glasses.get(mTimerId).transitionTimerState();
+			HashMap<Long, HourGlass> glasses = adapter.getHourGlassMap();
+			glasses.get(mTimerId).transitionTimerState();
 			
-			setTimerState(newState);
-
 			list.requery();
 		}
 

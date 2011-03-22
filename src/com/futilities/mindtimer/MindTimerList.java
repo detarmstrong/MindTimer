@@ -1,7 +1,10 @@
 package com.futilities.mindtimer;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.futilities.mindtimer.HourGlass.TimerState;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -19,6 +22,7 @@ public class MindTimerList extends ListActivity {
 	protected final static int ACTIVITY_CREATE = 1;
 	protected final static int ACTIVITY_EDIT = 0;
 	private static final String TAG = "MINDTIMERLIST";
+	private static final Long NO_TIMER_TO_START = -1L;
 	private final int INSERT_ID = 1;
 	private TimersDbAdapter mDbAdapter;
 	private MindTimerCursorAdapter mCursorAdapter;
@@ -33,9 +37,33 @@ public class MindTimerList extends ListActivity {
 
 		initDbAdapter();
 
+		// Get timerToStart id out of Intent
+		Intent intent = getIntent();
+		String action = intent.getAction();
+		Long timerToStart = intent.getLongExtra(TimersDbAdapter.KEY_ROWID,
+				NO_TIMER_TO_START);
+		
+		HourGlass glass = null;
+		if (timerToStart != NO_TIMER_TO_START) {
+			Cursor oneTimer = mDbAdapter.fetchOne(timerToStart);
+			oneTimer.moveToFirst();
+			long secondsDuration = oneTimer.getLong(oneTimer
+					.getColumnIndexOrThrow(TimersDbAdapter.KEY_SECONDS));
+
+			// set the deadline in the db
+			glass = new HourGlass(this, timerToStart, 0, 0, secondsDuration);
+			glass.setTimerState(TimerState.NOT_STARTED);
+			glass.transitionTimerState();
+			oneTimer.close();
+		}
+
 		Cursor cursor = mDbAdapter.fetchAll();
 
 		mCursorAdapter = new MindTimerCursorAdapter(this, cursor);
+
+		if (glass != null) {
+			mCursorAdapter.getHourGlassMap().put(timerToStart, glass);
+		}
 
 		setListAdapter(mCursorAdapter);
 
@@ -69,14 +97,14 @@ public class MindTimerList extends ListActivity {
 		mTimer = null;
 		initElapsationTask();
 		startElapsationTask();
-		
+
 		initDbAdapter();
 
 	}
 
 	private void initDbAdapter() {
 		mDbAdapter = new TimersDbAdapter(this);
-		mDbAdapter.open();		
+		mDbAdapter.open();
 	}
 
 	@Override
@@ -112,7 +140,7 @@ public class MindTimerList extends ListActivity {
 			case ACTIVITY_EDIT:
 			case ACTIVITY_CREATE:
 				Log.i(TAG, "About to call requery");
-				
+
 				// For some reason onCreate is not called before this;
 				// so the db adapter isn't open
 				mDbAdapter.open();
@@ -126,10 +154,10 @@ public class MindTimerList extends ListActivity {
 
 	void requery() {
 		CursorAdapter adapter = (CursorAdapter) getListAdapter();
-		
+
 		Cursor cursor = mDbAdapter.fetchAll();
 		adapter.changeCursor(cursor);
-		
+
 		adapter.notifyDataSetChanged();
 	}
 
@@ -173,14 +201,13 @@ public class MindTimerList extends ListActivity {
 				MindTimerListItemView itemView = (MindTimerListItemView) view
 						.getChildAt(first + i);
 
-				if(itemView != null){
+				if (itemView != null) {
 					itemView.updateProgress();
 				}
-					
+
 			}
 
 		}
 	};
-
 
 }

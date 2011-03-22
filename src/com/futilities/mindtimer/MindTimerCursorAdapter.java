@@ -17,7 +17,7 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 
 	private static final String TAG = "MINDTIMERCURSORADAPTER";
 	private Context mContext;
-	private HashMap<Long, HourGlass> mRunningTimers = new HashMap<Long, HourGlass>();
+	private HashMap<Long, HourGlass> mHourGlassMap = new HashMap<Long, HourGlass>();
 
 	public MindTimerCursorAdapter(Context context, Cursor c) {
 		super(context, c);
@@ -60,8 +60,8 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 				.getLong(cursor
 						.getColumnIndexOrThrow(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT));
 		long deadline = cursor
-		.getLong(cursor
-				.getColumnIndexOrThrow(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT));
+				.getLong(cursor
+						.getColumnIndexOrThrow(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT));
 
 		// Call methods in view used to populate fields
 		rowLayout.setTimerId(id);
@@ -90,11 +90,9 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 			state = TimerState.FINISHED;
 		}
 		
-		if (!mRunningTimers.containsKey(id)) {
-			HourGlass glass = new HourGlass(mContext, id, 0, 0, secondsDuration);
-			glass.setTimerState(state);
-			mRunningTimers.put(id, glass);
-		}
+		HourGlass glass = new HourGlass(mContext, id, 0, 0, secondsDuration);
+		glass.setTimerState(state);
+		mHourGlassMap.put(id, glass);
 		
 		rowLayout.setTimerState(state);
 		
@@ -107,8 +105,8 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 		return new MindTimerListItemView(context);
 	}
 	
-	public HashMap<Long, HourGlass> getRunningTimers() {
-		return mRunningTimers;
+	public HashMap<Long, HourGlass> getHourGlassMap() {
+		return mHourGlassMap;
 	}
 
 	// Commented because requery() causes bindView(), which updates views
