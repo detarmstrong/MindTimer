@@ -1,50 +1,107 @@
 package com.futilities.mindtimer;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Vibrator;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MindTimerAlarmReceiver extends BroadcastReceiver {
 
+	private TimersDbAdapter mDb;
+	private long mTimerId;
+	private Context mContext;
+	private Uri mUri;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Long timerId = intent.getLongExtra("timerId", -1L);
+		mTimerId = intent.getLongExtra("timerId", -1L);
+		mUri = intent.getData();
+		mContext = context;
 
-		Log.i("MindTimer", "alarm received of timer id " + timerId);
+		Log.i("MindTimer", "alarm received of timer id " + mTimerId);
 
-		TimersDbAdapter db = new TimersDbAdapter(context);
-		db.open();
+		mDb = new TimersDbAdapter(context);
+		mDb.open();
 
-		Cursor timer = db.fetchOne(timerId);
+		startNotification();
 
-		Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+		updateDb();
 
-		long milliseconds = 1000;
-		v.vibrate(milliseconds);
+		mDb.close();
+	}
 
-		long[] pattern = { 500, 300, 20, 100, 200 };
-		v.vibrate(pattern, -1);
-		
+	private void startNotification() {
+		Cursor timer = mDb.fetchOne(mTimerId);
+		if (timer == null) {
+			return;
+		}
+
 		String label = timer.getString(timer
 				.getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL));
 
-		Toast.makeText(context, "Timer '" + label + "' dings!",
-				Toast.LENGTH_SHORT).show();
-
-		ContentValues cv = new ContentValues();
-        cv.put(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT, 0);
-        cv.put(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT, 0);
-        
-        db.update(timerId, cv);
-
 		timer.close();
-		db.close();
+
+		if (TextUtils.isEmpty(label)) {
+			label = mContext.getString(R.string.app_name);
+		}
+
+		Intent notificationIntent = new Intent(mContext,
+				NotificationReceiver.class);
+		notificationIntent.setData(mUri);
+
+		// This intent will be forwarded on to the NotificationReceiver, which
+		// will generate an intent based on this intents URI
+		Intent stowawayIntent = new Intent();
+		stowawayIntent.setAction(Intent.ACTION_EDIT);
+		stowawayIntent.setData(mUri);
+
+		notificationIntent.putExtra(NotificationReceiver.EXTRA_LAUNCH_INTENT,
+				stowawayIntent.toUri(0));
+
+		// The PendingIntent to launch our activity if the user selects this
+		// notification
+		PendingIntent launchOnClickIntent = PendingIntent.getBroadcast(
+				mContext, 0, notificationIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+
+		// construct the Notification object.
+		Notification notif = new Notification(R.drawable.button_down, label,
+				System.currentTimeMillis());
+
+		// Set the info for the views that show in the notification panel.
+		notif.setLatestEventInfo(mContext, label, "Timer done",
+				launchOnClickIntent); // broadcast PendingIntent to NotificationReceiver
+
+		notif.vibrate = new long[] { 400, 100, 200, 100,100,100 };
+		notif.defaults |= Notification.DEFAULT_LIGHTS;
+		notif.defaults |= Notification.DEFAULT_SOUND;
+
+		notif.flags |= Notification.FLAG_INSISTENT;
+
+		// look up the notification manager service
+		NotificationManager nm = (NotificationManager) mContext
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		// Show countdown notification
+		nm.notify((int) mTimerId, notif);
+
+		// NotificationState.start(mContext, mUri);
+
 	}
 
+	public void updateDb() {
+		ContentValues cv = new ContentValues();
+		cv.put(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT, 0);
+		cv.put(TimersDbAdapter.KEY_STARTED_AT_MILLIS_SINCE_BOOT, 0);
+
+		mDb.update(mTimerId, cv);
+	}
 
 }
