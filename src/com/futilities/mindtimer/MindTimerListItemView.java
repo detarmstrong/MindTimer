@@ -188,7 +188,7 @@ public class MindTimerListItemView extends LinearLayout implements
 
 		case FINISHED:
 			mTimerControlButton
-					.setImageResource(R.drawable.slowpoke_pause_button);
+					.setImageResource(R.drawable.rewind);
 			break;
 		}
 

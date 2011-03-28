@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.nfc.NfcAdapter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -50,7 +52,9 @@ public class TimerEdit extends Activity {
 	private String mThumbnailStorageDir = Environment
 			.getExternalStorageDirectory().toString();
 	private boolean mIsTempThumbnail = false;
-
+	private boolean mApiSupportsNFC;
+	private NfcAdapter mNfcAdapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -174,7 +178,19 @@ public class TimerEdit extends Activity {
 			// to know is we can neither read nor write
 			mExternalStorageAvailable = mExternalStorageWriteable = false;
 		}
-
+		
+		int currentApiVersion = Build.VERSION.SDK_INT;
+		if(currentApiVersion < android.os.Build.VERSION_CODES.GINGERBREAD){
+			mApiSupportsNFC = false;
+		}
+		else {
+			mApiSupportsNFC = true;
+			mNfcAdapter = NfcAdapter.getDefaultAdapter();
+		}
+		
+		Log.i(TAG, "Api Supports NFC:" + mApiSupportsNFC);
+		Log.i(TAG, "NFC enabled: " + mNfcAdapter);
+		
 	}
 
 	protected void clearFields() {
@@ -214,61 +230,75 @@ public class TimerEdit extends Activity {
 				Bitmap bm = BitmapFactory.decodeFile(mThumbnailAbsolutePath);
 				mTimerIconView.setImageBitmap(bm);
 			}
-
-			// If nfc tag is attached, then show the tag_found_layout under
-			// edit_timer_nfc_layout
-			String nfcTagPayload = timer.getString(timer
-					.getColumnIndexOrThrow(TimersDbAdapter.KEY_NFC_ID));
-
-			mNfcRegionLayout = (ViewGroup) findViewById(R.id.edit_timer_nfc_layout);
-
-			mTagFoundLayout = (LinearLayout) getLayoutInflater().inflate(
-					R.layout.tag_found_layout, null);
-
-			mTagNotFoundLayout = (LinearLayout) getLayoutInflater().inflate(
-					R.layout.tag_not_found_layout, null);
-
-			TextView helpText = (TextView) mTagNotFoundLayout
-					.findViewById(R.id.what_is_a_nfc_tag_text_view);
-
-			// activate links in text
-			helpText.setMovementMethod(LinkMovementMethod.getInstance());
-
-			if (nfcTagPayload != null) {
-				mAppropriateNFCLayout = mTagFoundLayout;
-
-				Button forgetTag = (Button) mAppropriateNFCLayout
-						.findViewById(R.id.forget_tag_button);
-
-				forgetTag.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						ContentValues cv = new ContentValues();
-						cv.putNull(TimersDbAdapter.KEY_NFC_ID);
-						mDb.update(mTimerId, cv);
-
-						Toast.makeText(getApplicationContext(),
-								"NFC tag forgotten", Toast.LENGTH_SHORT).show();
-
-						mTagFoundLayout.removeAllViews();
-
-						mNfcRegionLayout.addView(mTagNotFoundLayout);
-					}
-				});
-
-				TextView tv = (TextView) mAppropriateNFCLayout
-						.findViewById(R.id.tag_payload);
-				tv.setText(nfcTagPayload);
-
-			} else {
-				mAppropriateNFCLayout = mTagNotFoundLayout;
-
+			
+			if(mApiSupportsNFC){
+				showTagInfo(timer);
+				
 			}
-
-			mNfcRegionLayout.addView(mAppropriateNFCLayout);
+			else {
+				hideMentionOfNfc();
+			}
 
 		}
 
+	}
+
+	private void hideMentionOfNfc(){
+		findViewById(R.id.nfc_tag_title).setVisibility(View.GONE);
+	}
+
+	private void showTagInfo(Cursor timer) {
+		// If nfc tag is attached, then show the tag_found_layout under
+		// edit_timer_nfc_layout
+		String nfcTagPayload = timer.getString(timer
+				.getColumnIndexOrThrow(TimersDbAdapter.KEY_NFC_ID));
+
+		mNfcRegionLayout = (ViewGroup) findViewById(R.id.edit_timer_nfc_layout);
+
+		mTagFoundLayout = (LinearLayout) getLayoutInflater().inflate(
+				R.layout.tag_found_layout, null);
+
+		mTagNotFoundLayout = (LinearLayout) getLayoutInflater().inflate(
+				R.layout.tag_not_found_layout, null);
+
+		TextView helpText = (TextView) mTagNotFoundLayout
+				.findViewById(R.id.what_is_a_nfc_tag_text_view);
+
+		// activate links in text
+		helpText.setMovementMethod(LinkMovementMethod.getInstance());
+
+		if (nfcTagPayload != null) {
+			mAppropriateNFCLayout = mTagFoundLayout;
+
+			Button forgetTag = (Button) mAppropriateNFCLayout
+					.findViewById(R.id.forget_tag_button);
+
+			forgetTag.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					ContentValues cv = new ContentValues();
+					cv.putNull(TimersDbAdapter.KEY_NFC_ID);
+					mDb.update(mTimerId, cv);
+
+					Toast.makeText(getApplicationContext(),
+							"NFC tag forgotten", Toast.LENGTH_SHORT).show();
+
+					mTagFoundLayout.removeAllViews();
+
+					mNfcRegionLayout.addView(mTagNotFoundLayout);
+				}
+			});
+
+			TextView tv = (TextView) mAppropriateNFCLayout
+					.findViewById(R.id.tag_payload);
+			tv.setText(nfcTagPayload);
+
+		} else {
+			mAppropriateNFCLayout = mTagNotFoundLayout;
+
+		}
+		
+		mNfcRegionLayout.addView(mAppropriateNFCLayout);
 	}
 
 	public static String toColonFormat(String hours, String minutes) {

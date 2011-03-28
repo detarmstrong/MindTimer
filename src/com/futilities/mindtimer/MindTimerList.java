@@ -1,6 +1,5 @@
 package com.futilities.mindtimer;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,6 +31,8 @@ public class MindTimerList extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		Log.i(TAG, "in onCreate");
 
 		setContentView(R.layout.timers_list);
 
@@ -39,7 +40,6 @@ public class MindTimerList extends ListActivity {
 
 		// Get timerToStart id out of Intent
 		Intent intent = getIntent();
-		String action = intent.getAction();
 		Long timerToStart = intent.getLongExtra(TimersDbAdapter.KEY_ROWID,
 				NO_TIMER_TO_START);
 		
@@ -75,9 +75,9 @@ public class MindTimerList extends ListActivity {
 	protected void onPause() {
 		super.onPause();
 
-		Log.i("mindtimer", "in onPause");
+		Log.i(TAG, "in onPause");
 
-		stopElapsationTask();
+		cancelElapsationTask();
 
 	}
 
@@ -85,14 +85,23 @@ public class MindTimerList extends ListActivity {
 	protected void onStop() {
 		super.onStop();
 
-		Log.i("MindTimer", "in onStop");
+		Log.i(TAG, "in onStop");
 
 		mDbAdapter.close();
+	}
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		Log.i(TAG, "in onDestroy");
+		
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		Log.i(TAG, "in onResume");
 
 		mTimer = null;
 		initElapsationTask();
@@ -103,8 +112,10 @@ public class MindTimerList extends ListActivity {
 	}
 
 	private void initDbAdapter() {
-		mDbAdapter = new TimersDbAdapter(this);
-		mDbAdapter.open();
+		if(mDbAdapter == null){
+			mDbAdapter = new TimersDbAdapter(this);
+			mDbAdapter.open();
+		}
 	}
 
 	@Override
@@ -173,7 +184,7 @@ public class MindTimerList extends ListActivity {
 
 	}
 
-	private void stopElapsationTask() {
+	private void cancelElapsationTask() {
 		mTimer.cancel();
 		mTimer.purge();
 

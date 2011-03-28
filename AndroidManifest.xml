@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.futilities.mindtimer"
-	android:versionCode="1" android:versionName="1.0" android:installLocation="internalOnly">
+<manifest package="com.futilities.mindtimer"
+	android:versionCode="1" android:versionName="1.0" android:installLocation="internalOnly" xmlns:android="http://schemas.android.com/apk/res/android">
 	<uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <supports-screens android:anyDensity="true"></supports-screens>
+    <uses-sdk android:targetSdkVersion="9" android:minSdkVersion="7"></uses-sdk>
 
 	<!-- Must install internalOnly because AlarmManagers are killed when files system mounted 
 		on usb http://developer.android.com/guide/appendix/install-location.html#ShouldNot -->
 	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+	
 	<application android:label="@string/app_name"
-		android:debuggable="true" android:icon="@drawable/button_down">
+		android:debuggable="true" android:icon="@drawable/ic_launcher">
 		<service android:process=":remote" android:name="MindTimerService" />
 		<receiver android:process=":remote" android:name="MindTimerAlarmReceiver" />
 		<activity android:name=".MindTimerList" android:label="@string/app_name">
@@ -37,7 +42,4 @@
 		</activity>
 		<receiver android:name="NotificationReceiver"></receiver>
 	</application>
-
-	<uses-feature android:name="android.hardware.nfc" android:required="false" />
-	<supports-screens android:anyDensity="true"></supports-screens>
 </manifest> 
