@@ -1,45 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="com.futilities.mindtimer"
-	android:versionCode="1" android:versionName="1.0" android:installLocation="internalOnly" xmlns:android="http://schemas.android.com/apk/res/android">
-	<uses-permission android:name="android.permission.NFC" />
-    <uses-feature android:name="android.hardware.nfc" android:required="false" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    android:versionCode="1" android:versionName="1.0"
+    android:installLocation="internalOnly" xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.nfc"
+        android:required="false" />
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
     <supports-screens android:anyDensity="true"></supports-screens>
-    <uses-sdk android:targetSdkVersion="9" android:minSdkVersion="7"></uses-sdk>
+    <uses-sdk android:targetSdkVersion="9"
+        android:minSdkVersion="7"></uses-sdk>
 
 	<!-- Must install internalOnly because AlarmManagers are killed when files system mounted 
 		on usb http://developer.android.com/guide/appendix/install-location.html#ShouldNot -->
-	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
-	
-	<application android:label="@string/app_name"
-		android:debuggable="true" android:icon="@drawable/ic_launcher">
-		<service android:process=":remote" android:name="MindTimerService" />
-		<receiver android:process=":remote" android:name="MindTimerAlarmReceiver" />
-		<activity android:name=".MindTimerList" android:label="@string/app_name">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
+    <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+
+    <application android:label="@string/app_name"
+        android:debuggable="true" android:icon="@drawable/ic_launcher">
+        <service android:process=":remote" android:name="MindTimerService" />
+        <receiver android:process=":remote" android:name="MindTimerAlarmReceiver" />
+        <activity android:name=".MindTimerList" android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
 				<!-- <action android:name="android.nfc.action.TAG_DISCOVERED"></action> -->
 				<!-- <category android:name="android.intent.category.DEFAULT"></category> -->
-			</intent-filter>
-		</activity>
+            </intent-filter>
+        </activity>
 
-		<activity android:name="TimerEdit"></activity>
+        <activity android:name="TimerEdit"></activity>
 
-		<activity android:name="IntervalPicker" android:label="Set Duration"
-			android:screenOrientation="portrait">
-			<intent-filter>
+        <activity android:name="IntervalPicker" android:label="Set Duration"
+            android:screenOrientation="portrait">
+            <intent-filter>
 				<!-- <action android:name="android.intent.action.MAIN"></action> -->
 				<!-- <category android:name="android.intent.category.LAUNCHER"></category> -->
-			</intent-filter>
-		</activity>
-		<activity android:screenOrientation="portrait" android:launchMode="standard"
-			android:name="TagTimerActivity">
-			<intent-filter>
-				<action android:name="android.nfc.action.TAG_DISCOVERED" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<receiver android:name="NotificationReceiver"></receiver>
-	</application>
+            </intent-filter>
+        </activity>
+        <activity android:screenOrientation="portrait"
+            android:launchMode="standard" android:name="TagTimerActivity">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <receiver android:name="NotificationReceiver"></receiver>
+    </application>
 </manifest> 

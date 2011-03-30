@@ -8,18 +8,18 @@ import android.net.Uri;
 
 public class NotificationReceiver extends BroadcastReceiver {
 
-	public static final String EXTRA_LAUNCH_INTENT = "launchIntent";
+    public static final String EXTRA_LAUNCH_INTENT = "launchIntent";
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		Uri uri = intent.getData();
-		int notification_id = Integer.parseInt(uri.getLastPathSegment());
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Uri uri = intent.getData();
+        int notification_id = Integer.parseInt(uri.getLastPathSegment());
 
-		NotificationManager nm = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
 
-		nm.cancel(notification_id);
+        nm.cancel(notification_id);
 
-	}
+    }
 
 }

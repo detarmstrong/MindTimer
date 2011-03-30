@@ -21,177 +21,179 @@ import android.widget.TextView;
 import com.futilities.mindtimer.HourGlass.TimerState;
 
 public class MindTimerListItemView extends LinearLayout implements
-		OnClickListener {
+        OnClickListener {
 
-	private static final String TAG = "MINDTIMERLISTVIEWITEM";
-	private Context mContext;
-	private TextView mLabelView;
-	private ImageButton mTimerControlButton;
-	private long mTimerId;
-	private TextView mDurationLabelView;
-	private ImageButton mTimerIconView;
-	private long mDeadline;
-	private TimerState mTimerState;
-	private TextView mTimeRemainingView;
-	private long mDeltaSeconds;
-	private int mSecondsDuration;
-	private View mProgressBar;
-	private int mStartingProgressBarWidth;
+    private static final String TAG = "MINDTIMERLISTVIEWITEM";
+    private Context mContext;
+    private TextView mLabelView;
+    private ImageButton mTimerControlButton;
+    private long mTimerId;
+    private TextView mDurationLabelView;
+    private ImageButton mTimerIconView;
+    private long mDeadline;
+    private TimerState mTimerState;
+    private TextView mTimeRemainingView;
+    private long mDeltaSeconds;
+    private int mSecondsDuration;
+    private View mProgressBar;
+    private int mStartingProgressBarWidth;
 
-	public MindTimerListItemView(Context context) {
-		super(context);
+    public MindTimerListItemView(Context context) {
+        super(context);
 
-		mContext = context;
-		LayoutInflater inflater = (LayoutInflater) mContext
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mContext = context;
+        LayoutInflater inflater = (LayoutInflater) mContext
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		inflater.inflate(R.layout.timers_row, this, true);
+        inflater.inflate(R.layout.timers_row, this, true);
 
-		mLabelView = (TextView) findViewById(R.id.TimerLabel);
-		mLabelView.setEllipsize(TruncateAt.MIDDLE);
-		mDurationLabelView = (TextView) findViewById(R.id.Duration);
-		mTimeRemainingView = (TextView) findViewById(R.id.TimeRemaining);
-		mTimerIconView = (ImageButton) findViewById(R.id.TimerImageButton);
-		mTimerControlButton = (ImageButton) findViewById(R.id.ToggleTimerOnOff);
-		mProgressBar = findViewById(R.id.progress_bar);
-		mTimerState = TimerState.NOT_STARTED;
+        mLabelView = (TextView) findViewById(R.id.TimerLabel);
+        mLabelView.setEllipsize(TruncateAt.MIDDLE);
+        mDurationLabelView = (TextView) findViewById(R.id.Duration);
+        mTimeRemainingView = (TextView) findViewById(R.id.TimeRemaining);
+        mTimerIconView = (ImageButton) findViewById(R.id.TimerImageButton);
+        mTimerControlButton = (ImageButton) findViewById(R.id.ToggleTimerOnOff);
+        mProgressBar = findViewById(R.id.progress_bar);
+        mTimerState = TimerState.NOT_STARTED;
 
-	}
+    }
 
-	public TimerState getTimerState() {
-		return mTimerState;
-	}
+    public TimerState getTimerState() {
+        return mTimerState;
+    }
 
-	public void setTimerState(TimerState timerState) {
-		// This code is broken because setTimerState doesn't exist on MindTimerList
-		// Trying to figure out if it went missing from TagTimerActivity
-		//MindTimerList list = (MindTimerList) mContext;
-		//list.setTimerState(mTimerId, timerState);
-		mTimerState = timerState;
-	}
+    public void setTimerState(TimerState timerState) {
+        // This code is broken because setTimerState doesn't exist on
+        // MindTimerList
+        // Trying to figure out if it went missing from TagTimerActivity
+        // MindTimerList list = (MindTimerList) mContext;
+        // list.setTimerState(mTimerId, timerState);
+        mTimerState = timerState;
+    }
 
-	public void setTimerId(long id) {
-		mTimerId = id;
-	}
+    public void setTimerId(long id) {
+        mTimerId = id;
+    }
 
-	public long getTimerId() {
-		return mTimerId;
-	}
+    public long getTimerId() {
+        return mTimerId;
+    }
 
-	public void setLabel(String label) {
-		mLabelView.setText(label);
-	}
+    public void setLabel(String label) {
+        mLabelView.setText(label);
+    }
 
-	public void setDurationLabel(String durationLabel) {
-		mDurationLabelView.setText(durationLabel);
-	}
+    public void setDurationLabel(String durationLabel) {
+        mDurationLabelView.setText(durationLabel);
+    }
 
-	public void setThumbnail(String thumbnailFilePath) {
-		File file = new File(thumbnailFilePath);
+    public void setThumbnail(String thumbnailFilePath) {
+        File file = new File(thumbnailFilePath);
 
-		if (file.exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(thumbnailFilePath);
-			mTimerIconView.setImageBitmap(bm);
-		} else {
-			mTimerIconView.setImageDrawable(getResources().getDrawable(
-					R.drawable.button_down));
-		}
-	}
+        if (file.exists()) {
+            Bitmap bm = BitmapFactory.decodeFile(thumbnailFilePath);
+            mTimerIconView.setImageBitmap(bm);
+        } else {
+            mTimerIconView.setImageDrawable(getResources().getDrawable(
+                    R.drawable.button_down));
+        }
+    }
 
-	public void setDeadline(long deadline) {
-		mDeadline = deadline;
-	}
+    public void setDeadline(long deadline) {
+        mDeadline = deadline;
+    }
 
-	public void setSecondsDuration(int secondsDuration) {
-		mSecondsDuration = secondsDuration;
+    public void setSecondsDuration(int secondsDuration) {
+        mSecondsDuration = secondsDuration;
 
-	}
+    }
 
-	@Override
-	public void onClick(View v) {
-		if (mTimerIconView == v) {
-			Log.i(TAG, "timer icon clicked");
-			Intent i = new Intent(mContext, TimerEdit.class);
-			i.putExtra(TimersDbAdapter.KEY_ROWID, mTimerId);
-			((MindTimerList) mContext).startActivityForResult(i,
-					MindTimerList.ACTIVITY_EDIT);
+    @Override
+    public void onClick(View v) {
+        if (mTimerIconView == v) {
+            Log.i(TAG, "timer icon clicked");
+            Intent i = new Intent(mContext, TimerEdit.class);
+            i.putExtra(TimersDbAdapter.KEY_ROWID, mTimerId);
+            ((MindTimerList) mContext).startActivityForResult(i,
+                    MindTimerList.ACTIVITY_EDIT);
 
-		} else if (mTimerControlButton == v) {
-			Log.i(TAG, "play button clicked " + mTimerId);
+        } else if (mTimerControlButton == v) {
+            Log.i(TAG, "play button clicked " + mTimerId);
 
-			MindTimerList list = (MindTimerList) mContext;
+            MindTimerList list = (MindTimerList) mContext;
 
-			MindTimerCursorAdapter adapter = (MindTimerCursorAdapter) list
-					.getListAdapter();
-			
-			HashMap<Long, HourGlass> glasses = adapter.getHourGlassMap();
-			glasses.get(mTimerId).transitionTimerState();
-			
-			list.requery();
-		}
+            MindTimerCursorAdapter adapter = (MindTimerCursorAdapter) list
+                    .getListAdapter();
 
-	}
+            HashMap<Long, HourGlass> glasses = adapter.getHourGlassMap();
+            glasses.get(mTimerId).transitionTimerState();
 
-	public void setEditClickListener() {
-		mTimerIconView.setOnClickListener(this);
-	}
+            list.requery();
+        }
 
-	// Listener is MindTimerListActivity
-	public void setTimerControlClickListener() {
-		mTimerControlButton.setOnClickListener(this);
-	}
+    }
 
-	public void updateProgress() {
-		// If the app is stopped and resumed, the deadline in the db may be in
-		// the past
-		long delta = Math.max(mDeadline - SystemClock.elapsedRealtime(), 0);
-		mDeltaSeconds = delta / 1000;
+    public void setEditClickListener() {
+        mTimerIconView.setOnClickListener(this);
+    }
 
-		ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) mTimeRemainingView
-				.getLayoutParams();
+    // Listener is MindTimerListActivity
+    public void setTimerControlClickListener() {
+        mTimerControlButton.setOnClickListener(this);
+    }
 
-		switch (mTimerState) {
-		case RUNNING:
-			if (mSecondsDuration <= 0) {
-				return;
-			}
+    public void updateProgress() {
+        // If the app is stopped and resumed, the deadline in the db may be in
+        // the past
+        long delta = Math.max(mDeadline - SystemClock.elapsedRealtime(), 0);
+        mDeltaSeconds = delta / 1000;
 
-			mTimerControlButton
-					.setImageResource(R.drawable.slowpoke_stop_button);
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) mTimeRemainingView
+                .getLayoutParams();
 
-			mTimeRemainingView.setText(HourGlass.getDurationString(delta));
+        switch (mTimerState) {
+            case RUNNING:
+                if (mSecondsDuration <= 0) {
+                    return;
+                }
 
-			mStartingProgressBarWidth = Math.max(
-					mProgressBar.getMeasuredWidth(), mStartingProgressBarWidth);
+                mTimerControlButton
+                        .setImageResource(R.drawable.slowpoke_stop_button);
 
-			// Use the left margin of the time remaining text to affect the
-			// width of the progress bar
-			int newProgressBarWidth = (int) ((mDeltaSeconds * mStartingProgressBarWidth) / mSecondsDuration);
+                mTimeRemainingView.setText(HourGlass.getDurationString(delta));
 
-			mlp.setMargins(
-					(int) (mStartingProgressBarWidth - newProgressBarWidth),
-					mlp.topMargin, mlp.rightMargin, mlp.bottomMargin);
+                mStartingProgressBarWidth = Math.max(
+                        mProgressBar.getMeasuredWidth(),
+                        mStartingProgressBarWidth);
 
-			if (delta <= 0) {
-				setTimerState(HourGlass.TimerState.FINISHED);
+                // Use the left margin of the time remaining text to affect the
+                // width of the progress bar
+                int newProgressBarWidth = (int) ((mDeltaSeconds * mStartingProgressBarWidth) / mSecondsDuration);
 
-			}
+                mlp.setMargins(
+                        (int) (mStartingProgressBarWidth - newProgressBarWidth),
+                        mlp.topMargin, mlp.rightMargin, mlp.bottomMargin);
 
-			break;
-		case NOT_STARTED:
-			mTimeRemainingView.setText(HourGlass.getDurationString(0));
-			mTimerControlButton
-					.setImageResource(R.drawable.slowpoke_play_button);
+                if (delta <= 0) {
+                    setTimerState(HourGlass.TimerState.FINISHED);
 
-			mlp.setMargins(0, mlp.topMargin, mlp.rightMargin, mlp.bottomMargin);
-			break;
+                }
 
-		case FINISHED:
-			mTimerControlButton
-					.setImageResource(R.drawable.rewind);
-			break;
-		}
+                break;
+            case NOT_STARTED:
+                mTimeRemainingView.setText(HourGlass.getDurationString(0));
+                mTimerControlButton
+                        .setImageResource(R.drawable.slowpoke_play_button);
 
-	}
+                mlp.setMargins(0, mlp.topMargin, mlp.rightMargin,
+                        mlp.bottomMargin);
+                break;
+
+            case FINISHED:
+                mTimerControlButton.setImageResource(R.drawable.rewind);
+                break;
+        }
+
+    }
 
 }

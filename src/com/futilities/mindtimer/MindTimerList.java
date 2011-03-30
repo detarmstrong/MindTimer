@@ -18,207 +18,207 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 public class MindTimerList extends ListActivity {
-	protected final static int ACTIVITY_CREATE = 1;
-	protected final static int ACTIVITY_EDIT = 0;
-	private static final String TAG = "MINDTIMERLIST";
-	private static final Long NO_TIMER_TO_START = -1L;
-	private final int INSERT_ID = 1;
-	private TimersDbAdapter mDbAdapter;
-	private MindTimerCursorAdapter mCursorAdapter;
-	private Timer mTimer;
-	private ElapsationTask mElapsationTask;
+    protected final static int ACTIVITY_CREATE = 1;
+    protected final static int ACTIVITY_EDIT = 0;
+    private static final String TAG = "MINDTIMERLIST";
+    private static final Long NO_TIMER_TO_START = -1L;
+    private final int INSERT_ID = 1;
+    private TimersDbAdapter mDbAdapter;
+    private MindTimerCursorAdapter mCursorAdapter;
+    private Timer mTimer;
+    private ElapsationTask mElapsationTask;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		Log.i(TAG, "in onCreate");
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.timers_list);
+        Log.i(TAG, "in onCreate");
 
-		initDbAdapter();
+        setContentView(R.layout.timers_list);
 
-		// Get timerToStart id out of Intent
-		Intent intent = getIntent();
-		Long timerToStart = intent.getLongExtra(TimersDbAdapter.KEY_ROWID,
-				NO_TIMER_TO_START);
-		
-		HourGlass glass = null;
-		if (timerToStart != NO_TIMER_TO_START) {
-			Cursor oneTimer = mDbAdapter.fetchOne(timerToStart);
-			oneTimer.moveToFirst();
-			long secondsDuration = oneTimer.getLong(oneTimer
-					.getColumnIndexOrThrow(TimersDbAdapter.KEY_SECONDS));
+        initDbAdapter();
 
-			// set the deadline in the db
-			glass = new HourGlass(this, timerToStart, 0, 0, secondsDuration);
-			glass.setTimerState(TimerState.NOT_STARTED);
-			glass.transitionTimerState();
-			oneTimer.close();
-		}
+        // Get timerToStart id out of Intent
+        Intent intent = getIntent();
+        Long timerToStart = intent.getLongExtra(TimersDbAdapter.KEY_ROWID,
+                NO_TIMER_TO_START);
 
-		Cursor cursor = mDbAdapter.fetchAll();
+        HourGlass glass = null;
+        if (timerToStart != NO_TIMER_TO_START) {
+            Cursor oneTimer = mDbAdapter.fetchOne(timerToStart);
+            oneTimer.moveToFirst();
+            long secondsDuration = oneTimer.getLong(oneTimer
+                    .getColumnIndexOrThrow(TimersDbAdapter.KEY_SECONDS));
 
-		mCursorAdapter = new MindTimerCursorAdapter(this, cursor);
+            // set the deadline in the db
+            glass = new HourGlass(this, timerToStart, 0, 0, secondsDuration);
+            glass.setTimerState(TimerState.NOT_STARTED);
+            glass.transitionTimerState();
+            oneTimer.close();
+        }
 
-		if (glass != null) {
-			mCursorAdapter.getHourGlassMap().put(timerToStart, glass);
-		}
+        Cursor cursor = mDbAdapter.fetchAll();
 
-		setListAdapter(mCursorAdapter);
+        mCursorAdapter = new MindTimerCursorAdapter(this, cursor);
 
-		initElapsationTask();
+        if (glass != null) {
+            mCursorAdapter.getHourGlassMap().put(timerToStart, glass);
+        }
 
-	}
+        setListAdapter(mCursorAdapter);
 
-	@Override
-	protected void onPause() {
-		super.onPause();
+        initElapsationTask();
 
-		Log.i(TAG, "in onPause");
+    }
 
-		cancelElapsationTask();
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-	}
+        Log.i(TAG, "in onPause");
 
-	@Override
-	protected void onStop() {
-		super.onStop();
+        cancelElapsationTask();
 
-		Log.i(TAG, "in onStop");
+    }
 
-		mDbAdapter.close();
-	}
-	
-	@Override
-	protected void onDestroy(){
-		super.onDestroy();
-		Log.i(TAG, "in onDestroy");
-		
-	}
+    @Override
+    protected void onStop() {
+        super.onStop();
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		
-		Log.i(TAG, "in onResume");
+        Log.i(TAG, "in onStop");
 
-		mTimer = null;
-		initElapsationTask();
-		startElapsationTask();
+        mDbAdapter.close();
+    }
 
-		initDbAdapter();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "in onDestroy");
 
-	}
+    }
 
-	private void initDbAdapter() {
-		if(mDbAdapter == null){
-			mDbAdapter = new TimersDbAdapter(this);
-			mDbAdapter.open();
-		}
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-		return true;
-	}
+        Log.i(TAG, "in onResume");
 
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case INSERT_ID:
-			createTimer();
-			return true;
-		}
+        mTimer = null;
+        initElapsationTask();
+        startElapsationTask();
 
-		return super.onMenuItemSelected(featureId, item);
-	}
+        initDbAdapter();
 
-	private void createTimer() {
-		Intent i = new Intent(this, TimerEdit.class);
-		startActivityForResult(i, ACTIVITY_CREATE);
+    }
 
-	}
+    private void initDbAdapter() {
+        if (mDbAdapter == null) {
+            mDbAdapter = new TimersDbAdapter(this);
+            mDbAdapter.open();
+        }
+    }
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+        return true;
+    }
 
-		if (resultCode == RESULT_OK) {
-			switch (requestCode) {
-			case ACTIVITY_EDIT:
-			case ACTIVITY_CREATE:
-				Log.i(TAG, "About to call requery");
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case INSERT_ID:
+                createTimer();
+                return true;
+        }
 
-				// For some reason onCreate is not called before this;
-				// so the db adapter isn't open
-				mDbAdapter.open();
+        return super.onMenuItemSelected(featureId, item);
+    }
 
-				requery();
+    private void createTimer() {
+        Intent i = new Intent(this, TimerEdit.class);
+        startActivityForResult(i, ACTIVITY_CREATE);
 
-				break;
-			}
-		}
-	}
+    }
 
-	void requery() {
-		CursorAdapter adapter = (CursorAdapter) getListAdapter();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-		Cursor cursor = mDbAdapter.fetchAll();
-		adapter.changeCursor(cursor);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case ACTIVITY_EDIT:
+                case ACTIVITY_CREATE:
+                    Log.i(TAG, "About to call requery");
 
-		adapter.notifyDataSetChanged();
-	}
+                    // For some reason onCreate is not called before this;
+                    // so the db adapter isn't open
+                    mDbAdapter.open();
 
-	private void initElapsationTask() {
-		// foreground UI updates depend on this timer thread
-		mTimer = new Timer();
-		mElapsationTask = new ElapsationTask();
+                    requery();
 
-	}
+                    break;
+            }
+        }
+    }
 
-	private void startElapsationTask() {
-		mTimer.schedule(mElapsationTask, 1000, 1000);
+    void requery() {
+        CursorAdapter adapter = (CursorAdapter) getListAdapter();
 
-	}
+        Cursor cursor = mDbAdapter.fetchAll();
+        adapter.changeCursor(cursor);
 
-	private void cancelElapsationTask() {
-		mTimer.cancel();
-		mTimer.purge();
+        adapter.notifyDataSetChanged();
+    }
 
-	}
+    private void initElapsationTask() {
+        // foreground UI updates depend on this timer thread
+        mTimer = new Timer();
+        mElapsationTask = new ElapsationTask();
 
-	private class ElapsationTask extends TimerTask {
-		public void run() {
-			mUiUpdateHandler.sendMessage(mUiUpdateHandler.obtainMessage(0));
+    }
 
-		}
-	}
+    private void startElapsationTask() {
+        mTimer.schedule(mElapsationTask, 1000, 1000);
 
-	private Handler mUiUpdateHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
+    }
 
-			// Update all visible views.
-			ListView view = getListView();
+    private void cancelElapsationTask() {
+        mTimer.cancel();
+        mTimer.purge();
 
-			int first = view.getFirstVisiblePosition();
-			int count = view.getChildCount();
+    }
 
-			for (int i = 0; i < count; i++) {
-				MindTimerListItemView itemView = (MindTimerListItemView) view
-						.getChildAt(first + i);
+    private class ElapsationTask extends TimerTask {
+        public void run() {
+            mUiUpdateHandler.sendMessage(mUiUpdateHandler.obtainMessage(0));
 
-				if (itemView != null) {
-					itemView.updateProgress();
-				}
+        }
+    }
 
-			}
+    private Handler mUiUpdateHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
 
-		}
-	};
+            // Update all visible views.
+            ListView view = getListView();
+
+            int first = view.getFirstVisiblePosition();
+            int count = view.getChildCount();
+
+            for (int i = 0; i < count; i++) {
+                MindTimerListItemView itemView = (MindTimerListItemView) view
+                        .getChildAt(first + i);
+
+                if (itemView != null) {
+                    itemView.updateProgress();
+                }
+
+            }
+
+        }
+    };
 
 }
