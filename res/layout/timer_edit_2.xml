@@ -1,51 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent" android:layout_height="match_parent"
-	android:orientation="vertical" android:padding="0dp" android:id="@+id/timerLabel"
-	android:layout_marginBottom="0dp">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="0dp" android:id="@+id/timerLabel"
+    android:layout_marginBottom="0dp">
 
-	<LinearLayout android:id="@+id/time_and_label_row" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:orientation="horizontal">
-		
-		<TextView android:text="00:00" android:id="@+id/Interval2"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:textSize="50sp" android:layout_weight="3" android:gravity="center_horizontal"></TextView>
-		
-		<ImageButton android:id="@+id/TimerIcon" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:src="@drawable/button_down"
-            android:gravity="center_vertical"  android:layout_margin="8dp"/>
-	</LinearLayout>
+    <LinearLayout android:id="@+id/time_and_label_row"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-	<LinearLayout android:id="@+id/time_and_label_row" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:orientation="vertical">
-		<TextView android:text="Label " android:id="@+id/add_label"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView android:text="00:00" android:id="@+id/Interval2"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="50sp" android:layout_weight="3"
+            android:gravity="center_horizontal"></TextView>
 
-		<EditText android:id="@+id/LabelEdit" android:layout_width="match_parent"
-			android:layout_height="wrap_content"></EditText>
+        <ImageButton android:id="@+id/TimerIcon"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:src="@drawable/button_down" android:gravity="center_vertical"
+            android:layout_margin="8dp" />
+    </LinearLayout>
 
-	</LinearLayout>
+    <LinearLayout android:id="@+id/time_and_label_row"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView android:text="Label " android:id="@+id/add_label"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	<ScrollView android:layout_width="match_parent" android:layout_height="0dip"
-		android:layout_weight="1" android:background="@drawable/box" android:layout_marginTop="10dp"
-		android:layout_marginBottom="10dp">
+        <EditText android:id="@+id/LabelEdit"
+            android:layout_width="match_parent" android:layout_height="wrap_content"></EditText>
 
-		<LinearLayout android:id="@+id/edit_timer_nfc_layout" android:layout_width="fill_parent" android:layout_height="fill_parent"
-			android:orientation="vertical">
-			<TextView android:text="@string/nfc_tag" android:layout_width="match_parent"
-				android:id="@+id/nfc_tag_title" android:textAppearance="?android:attr/textAppearanceMedium"
-				android:layout_height="wrap_content"></TextView>
+    </LinearLayout>
+
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="0dip" android:layout_weight="1"
+        android:background="@drawable/box" android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <LinearLayout android:id="@+id/edit_timer_nfc_layout"
+            android:layout_width="fill_parent" android:layout_height="fill_parent"
+            android:orientation="vertical">
+            <TextView android:text="@string/nfc_tag"
+                android:layout_width="match_parent" android:id="@+id/nfc_tag_title"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_height="wrap_content"></TextView>
 
 
-		</LinearLayout>
-	</ScrollView>
+        </LinearLayout>
+    </ScrollView>
 
-	<LinearLayout android:id="@+id/BottomRegion" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:background="@drawable/box">
-		<Button android:layout_height="wrap_content" android:layout_width="0dp"
-			android:layout_weight="1" android:id="@+id/CancelEdit" android:text="Cancel"></Button>
-		<Button android:layout_height="wrap_content" android:layout_width="0dp"
-			android:layout_weight="1" android:id="@+id/SaveEdit" android:text="Save"></Button>
-	</LinearLayout>
+    <LinearLayout android:id="@+id/BottomRegion"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:background="@drawable/box">
+        <Button android:layout_height="wrap_content"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:id="@+id/CancelEdit" android:text="Cancel"></Button>
+        <Button android:layout_height="wrap_content"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:id="@+id/SaveEdit" android:text="Save"></Button>
+    </LinearLayout>
 </LinearLayout>

@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent" android:layout_height="match_parent"
-	android:orientation="vertical" android:padding="6dp" android:id="@+id/timerLabel"
-	android:layout_marginBottom="0dp">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="6dp" android:id="@+id/timerLabel"
+    android:layout_marginBottom="0dp">
 
-	<TextView android:id="@+id/title" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:singleLine="true" android:textSize="30sp"
-		android:textStyle="bold" android:gravity="center_vertical" android:text="Tag For Timer"
-		android:layout_marginBottom="4dp" />
+    <TextView android:id="@+id/title" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:singleLine="true"
+        android:textSize="30sp" android:textStyle="bold"
+        android:gravity="center_vertical" android:text="Tag For Timer"
+        android:layout_marginBottom="4dp" />
 
-	<TextView android:id="@+id/tag_identifier" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:singleLine="true"
-		android:textAppearance="?android:attr/textAppearanceMedium" android:textStyle="bold"
-		android:gravity="center_vertical" android:text="This tag starts timer ..." />
+    <TextView android:id="@+id/tag_identifier"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:singleLine="true" android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" android:gravity="center_vertical"
+        android:text="This tag starts timer ..." />
 
 	<!-- Content -->
-	<ScrollView android:layout_width="match_parent" android:layout_height="0dip"
-		android:layout_weight="1" android:background="@drawable/box" android:layout_marginTop="10dp"
-		android:layout_marginBottom="10dp">
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="0dip" android:layout_weight="1"
+        android:background="@drawable/box" android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
 
-		<LinearLayout android:id="@+id/timer_list" android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:orientation="vertical">
+        <LinearLayout android:id="@+id/timer_list"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-			<include layout="@layout/tag_for_timer_row" android:id="@+id/list_ref"
-				android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <include layout="@layout/tag_for_timer_row"
+                android:id="@+id/list_ref" android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-		</LinearLayout>
+        </LinearLayout>
 
-	</ScrollView>
+    </ScrollView>
 
-	<LinearLayout android:id="@+id/BottomRegion" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:background="@drawable/box">
-		<Button android:layout_height="wrap_content" android:layout_width="0dp"
-			android:layout_weight="1" android:id="@+id/CancelTagForTimerButton" android:text="Cancel"></Button>
-		<Button android:layout_height="wrap_content" android:layout_width="0dp"
-			android:layout_weight="1" android:id="@+id/SaveTagForTimerButton" android:text="Save"></Button>
-	</LinearLayout>
+    <LinearLayout android:id="@+id/BottomRegion"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:background="@drawable/box">
+        <Button android:layout_height="wrap_content"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:id="@+id/CancelTagForTimerButton" android:text="Cancel"></Button>
+        <Button android:layout_height="wrap_content"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:id="@+id/SaveTagForTimerButton" android:text="Save"></Button>
+    </LinearLayout>
 </LinearLayout>

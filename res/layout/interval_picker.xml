@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical">
+    android:layout_width="fill_parent" android:layout_height="fill_parent"
+    android:orientation="vertical">
 
-	<LinearLayout android:id="@+id/LinearLayout01" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:gravity="center_horizontal">
-		
-		<TextView android:text="00" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:id="@+id/HourPartText" android:singleLine="true"
-			android:gravity="right" android:textSize="55sp"/>
-			
-        <TextView android:text=":" android:layout_height="wrap_content"
-            android:layout_width="wrap_content" android:id="@+id/HourPartText" android:singleLine="true"
-            android:gravity="right" android:textSize="55sp"/>
-            		
+    <LinearLayout android:id="@+id/LinearLayout01"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
         <TextView android:text="00" android:layout_height="wrap_content"
-            android:layout_width="wrap_content" android:id="@+id/MinutePartText" android:singleLine="true"
-            android:gravity="left" android:textSize="55sp"/>
-            
-	</LinearLayout>
+            android:layout_width="wrap_content" android:id="@+id/HourPartText"
+            android:singleLine="true" android:gravity="right"
+            android:textSize="55sp" />
 
-	<LinearLayout android:id="@+id/LinearLayout02" android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<Button android:layout_height="wrap_content" android:layout_width="0dp"
-			android:layout_weight="1" android:id="@+id/SelectHoursButton" android:text="Hours"></Button>
-		<Button android:layout_height="wrap_content" android:layout_width="0dp"
-			android:id="@+id/SelectMinutesButton" android:text="Minutes" android:layout_weight="1"></Button>
-	</LinearLayout>
+        <TextView android:text=":" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:id="@+id/HourPartText"
+            android:singleLine="true" android:gravity="right"
+            android:textSize="55sp" />
+
+        <TextView android:text="00" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:id="@+id/MinutePartText"
+            android:singleLine="true" android:gravity="left"
+            android:textSize="55sp" />
+
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/LinearLayout02"
+        android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <Button android:layout_height="wrap_content"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:id="@+id/SelectHoursButton" android:text="Hours"></Button>
+        <Button android:layout_height="wrap_content"
+            android:layout_width="0dp" android:id="@+id/SelectMinutesButton"
+            android:text="Minutes" android:layout_weight="1"></Button>
+    </LinearLayout>
 
 
 	<!-- <LinearLayout android:id="@+id/LinearLayout03" android:layout_width="wrap_content" -->
@@ -73,23 +79,23 @@
 	<!-- android:id="@+id/ButtonBackspace" android:text="&lt; Back"></Button> -->
 <!---->
 	<!-- </LinearLayout> -->
-	<LinearLayout android:id="@+id/NumPadLayout" android:layout_width="wrap_content"
-		android:layout_height="0dp" android:layout_weight="4">
+    <LinearLayout android:id="@+id/NumPadLayout"
+        android:layout_width="wrap_content" android:layout_height="0dp"
+        android:layout_weight="4">
 
-	</LinearLayout>
+    </LinearLayout>
 
-	<LinearLayout android:id="@+id/LinearLayout07" android:layout_width="fill_parent"
-		android:layout_height="0dp" android:layout_weight="1" android:paddingTop="10dp">
+    <LinearLayout android:id="@+id/LinearLayout07"
+        android:layout_width="fill_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:paddingTop="10dp">
 		
 <!--		android:layout_width="0dp" android:layout_weight="1"-->
-		<Button android:text="Cancel" android:id="@+id/CancelButton"
-		    android:layout_weight="1"
-		    android:layout_width="0dp"
-			android:layout_height="wrap_content"></Button>
-		<Button android:text="Done" android:id="@+id/DoneButton" 
-		      android:layout_weight="1"
-		      android:layout_width="0dp"
-		      android:layout_height="wrap_content"></Button>
+        <Button android:text="Cancel" android:id="@+id/CancelButton"
+            android:layout_weight="1" android:layout_width="0dp"
+            android:layout_height="wrap_content"></Button>
+        <Button android:text="Done" android:id="@+id/DoneButton"
+            android:layout_weight="1" android:layout_width="0dp"
+            android:layout_height="wrap_content"></Button>
 
-	</LinearLayout>
+    </LinearLayout>
 </LinearLayout>

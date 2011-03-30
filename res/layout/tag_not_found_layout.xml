@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/tag_not_found_layout" android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical">
-	<TextView android:text="No tag associated with timer" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:layout_weight="2" android:gravity="center_horizontal"></TextView>
-	<TextView android:text="@string/what_is_a_nfc_tag" android:id="@+id/what_is_a_nfc_tag_text_view" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:layout_weight="2" android:gravity="center_horizontal"
-		></TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tag_not_found_layout" android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:orientation="vertical">
+    <TextView android:text="No tag associated with timer"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_weight="2" android:gravity="center_horizontal"></TextView>
+    <TextView android:text="@string/what_is_a_nfc_tag"
+        android:id="@+id/what_is_a_nfc_tag_text_view"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_weight="2" android:gravity="center_horizontal"></TextView>
 </LinearLayout>
 
