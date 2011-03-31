@@ -55,6 +55,9 @@ public class MindTimerList extends ListActivity {
             glass.setTimerState(TimerState.NOT_STARTED);
             glass.transitionTimerState();
             oneTimer.close();
+            
+            // clear this extra from the intent
+            intent.removeExtra(TimersDbAdapter.KEY_ROWID);
         }
 
         Cursor cursor = mDbAdapter.fetchAll();
@@ -78,6 +81,7 @@ public class MindTimerList extends ListActivity {
         Log.i(TAG, "in onPause");
 
         cancelElapsationTask();
+        
 
     }
 
@@ -86,8 +90,8 @@ public class MindTimerList extends ListActivity {
         super.onStop();
 
         Log.i(TAG, "in onStop");
-
         mDbAdapter.close();
+        
     }
 
     @Override
@@ -102,17 +106,21 @@ public class MindTimerList extends ListActivity {
         super.onResume();
 
         Log.i(TAG, "in onResume");
+        
+        initDbAdapter();
 
         mTimer = null;
         initElapsationTask();
         startElapsationTask();
 
-        initDbAdapter();
 
     }
 
     private void initDbAdapter() {
-        if (mDbAdapter == null) {
+        if(mDbAdapter != null && mDbAdapter.isDbOpen()){
+            // Do nothing
+        }
+        else{
             mDbAdapter = new TimersDbAdapter(this);
             mDbAdapter.open();
         }
@@ -152,7 +160,7 @@ public class MindTimerList extends ListActivity {
                 case ACTIVITY_CREATE:
                     Log.i(TAG, "About to call requery");
 
-                    // For some reason onCreate is not called before this;
+                    // onCreate is not always called before this;
                     // so the db adapter isn't open
                     mDbAdapter.open();
 
@@ -205,9 +213,9 @@ public class MindTimerList extends ListActivity {
             // Update all visible views.
             ListView view = getListView();
 
-            int first = view.getFirstVisiblePosition();
-            int count = view.getChildCount();
-
+            int first = view.getFirstVisiblePosition() - 2;
+            int last = view.getLastVisiblePosition() + 1;
+            int count = last - first;
             for (int i = 0; i < count; i++) {
                 MindTimerListItemView itemView = (MindTimerListItemView) view
                         .getChildAt(first + i);

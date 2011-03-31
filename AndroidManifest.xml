@@ -38,6 +38,8 @@
 				<!-- <category android:name="android.intent.category.LAUNCHER"></category> -->
             </intent-filter>
         </activity>
+        
+        <!--TODO determine why adding this causes database error: android:finishOnTaskLaunch="true" -->
         <activity android:screenOrientation="portrait"
             android:launchMode="standard" android:name="TagTimerActivity">
             <intent-filter>

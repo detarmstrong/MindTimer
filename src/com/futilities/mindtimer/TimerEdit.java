@@ -59,6 +59,17 @@ public class TimerEdit extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        int currentApiVersion = Build.VERSION.SDK_INT;
+        if (currentApiVersion < android.os.Build.VERSION_CODES.GINGERBREAD) {
+            mApiSupportsNFC = false;
+        } else {
+            mApiSupportsNFC = true;
+            mNfcAdapter = NfcAdapter.getDefaultAdapter();
+        }
+
+        Log.i(TAG, "Api Supports NFC:" + mApiSupportsNFC);
+        Log.i(TAG, "NFC enabled: " + mNfcAdapter);
+        
         // Magic (to me) to prevent the softkeyboard from coming up on activity
         // start
         this.getWindow().setSoftInputMode(
@@ -179,17 +190,6 @@ public class TimerEdit extends Activity {
             mExternalStorageAvailable = mExternalStorageWriteable = false;
         }
 
-        int currentApiVersion = Build.VERSION.SDK_INT;
-        if (currentApiVersion < android.os.Build.VERSION_CODES.GINGERBREAD) {
-            mApiSupportsNFC = false;
-        } else {
-            mApiSupportsNFC = true;
-            mNfcAdapter = NfcAdapter.getDefaultAdapter();
-        }
-
-        Log.i(TAG, "Api Supports NFC:" + mApiSupportsNFC);
-        Log.i(TAG, "NFC enabled: " + mNfcAdapter);
-
     }
 
     protected void clearFields() {
@@ -230,9 +230,10 @@ public class TimerEdit extends Activity {
                 mTimerIconView.setImageBitmap(bm);
             }
 
+            Log.i(TAG, "apisupport" + mApiSupportsNFC);
+            
             if (mApiSupportsNFC) {
                 showTagInfo(timer);
-
             } else {
                 hideMentionOfNfc();
             }

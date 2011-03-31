@@ -85,6 +85,7 @@ public class TimersDbAdapter {
     }
 
     public void close() {
+        mDb.close();
         mDbHelper.close();
     }
 
@@ -170,6 +171,10 @@ public class TimersDbAdapter {
         String sql = "select count(*) from " + DATABASE_TABLE;
         SQLiteStatement sqlStatement = mDb.compileStatement(sql);
         return sqlStatement.simpleQueryForLong();
+    }
+
+    public boolean isDbOpen() {
+        return mDb.isOpen();
     }
 
 }

@@ -27,9 +27,6 @@ public class MindTimerCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.i(TAG, "in BindView for cursor " + cursor);
-        Log.i(TAG, "cursor position: " + cursor.getPosition());
-
         MindTimerListItemView rowLayout = (MindTimerListItemView) view;
 
         long id = cursor.getLong(cursor
@@ -75,7 +72,6 @@ public class MindTimerCursorAdapter extends CursorAdapter {
         }
 
         rowLayout.setThumbnail(thumbnailFilePath);
-        Log.i(TAG, "setting thumbnail " + thumbnailFilePath);
 
         rowLayout.setDeadline(deadline);
 

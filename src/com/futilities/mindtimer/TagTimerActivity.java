@@ -37,7 +37,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
     private static final String TAG = "TagTimerActivity";
     private LinearLayout mTimerList;
     private Button mCancelButton;
-    private TimersDbAdapter mDbHelper;
+    private TimersDbAdapter mDbAdapter;
     private Long[] mTimerIds;
     private Button mSaveButton;
     private List<String> mPayloadsRead;
@@ -88,17 +88,17 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                                 + mPayloadsRead.get(mPayloadsRead.size() - 1));
             }
 
-            mDbHelper = new TimersDbAdapter(this);
-            mDbHelper.open();
+            mDbAdapter = new TimersDbAdapter(this);
+            mDbAdapter.open();
 
             // TODO escape single quotes in sql where string
             // TODO if multiple viable records in message, then allow each for
             // associating
-            Cursor foundByPayload0 = mDbHelper
+            Cursor foundByPayload0 = mDbAdapter
                     .fetchWhere(TimersDbAdapter.KEY_NFC_ID + " = '"
                             + mPayloadsRead.get(mPayloadsRead.size() - 1) + "'");
             startManagingCursor(foundByPayload0);
-
+            
             if (foundByPayload0.getCount() > 0) {
                 foundByPayload0.moveToFirst();
 
@@ -146,10 +146,9 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                 toast.setView(layout);
                 toast.show();
 
-                // TODO broadcast message to start timer (doesn't launch timer list,
-                // just sets the notification and starts manager, headless
+                //TODO figure out why if I do this here then in mintimerlist I get error: 
+                mDbAdapter.close();
                 
-                //TODO Broadcast intent OR explicitly launch intent?
                 Intent wantTimerStarted = new Intent(this, MindTimerList.class);
                 wantTimerStarted.putExtra(TimersDbAdapter.KEY_ROWID, timerId);
                 startActivity(wantTimerStarted);
@@ -160,6 +159,8 @@ public class TagTimerActivity extends Activity implements OnClickListener,
                 finish();
 
                 Log.v(TAG, "AFTER FINISH CALLED");
+                
+                return;
 
             }
 
@@ -172,6 +173,8 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             mSaveButton.setOnClickListener(this);
 
             fillData();
+            
+            mDbAdapter.close();
 
         } else {
             Log.e(TAG, "Unknown intent " + intent);
@@ -186,12 +189,12 @@ public class TagTimerActivity extends Activity implements OnClickListener,
         content.removeAllViews();
 
         // get cursor for all timers without tags
-        Cursor timersCursor = mDbHelper.fetchWhere(TimersDbAdapter.KEY_NFC_ID
+        Cursor timersCursor = mDbAdapter.fetchWhere(TimersDbAdapter.KEY_NFC_ID
                 + " IS NULL");
         startManagingCursor(timersCursor);
 
         // get count of all timers
-        long countAll = mDbHelper.countAll();
+        long countAll = mDbAdapter.countAll();
 
         mTimerIds = new Long[timersCursor.getCount()];
 
@@ -263,7 +266,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
                 ContentValues cv = new ContentValues(1);
                 cv.put(TimersDbAdapter.KEY_NFC_ID, mPayloadsRead.get(0));
-                mDbHelper.update(timerId, cv);
+                mDbAdapter.update(timerId, cv);
 
                 setResult(RESULT_OK);
                 finish();
@@ -302,6 +305,13 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
         buttonView.setChecked(isChecked);
 
+    }
+    
+    @Override
+    public void onStop(){
+        super.onStop();
+        
+        mDbAdapter.close();
     }
 
 }
