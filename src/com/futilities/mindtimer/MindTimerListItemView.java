@@ -110,7 +110,7 @@ public class MindTimerListItemView extends LinearLayout implements
 
     @Override
     public void onClick(View v) {
-        if (mTimerIconView == v) {
+        if (mTimerIconView == v || mLabelView == v) {
             Log.i(TAG, "timer icon clicked");
             Intent i = new Intent(mContext, TimerEdit.class);
             i.putExtra(TimersDbAdapter.KEY_ROWID, mTimerId);
@@ -135,6 +135,7 @@ public class MindTimerListItemView extends LinearLayout implements
 
     public void setEditClickListener() {
         mTimerIconView.setOnClickListener(this);
+        mLabelView.setOnClickListener(this);
     }
 
     // Listener is MindTimerListActivity
