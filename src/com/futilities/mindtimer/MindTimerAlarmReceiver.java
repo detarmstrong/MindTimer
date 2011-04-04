@@ -14,6 +14,7 @@ import android.util.Log;
 
 public class MindTimerAlarmReceiver extends BroadcastReceiver {
 
+    private static final String TAG = "MINDTIMERALARMRECEIVER";
     private TimersDbAdapter mDb;
     private long mTimerId;
     private Context mContext;
