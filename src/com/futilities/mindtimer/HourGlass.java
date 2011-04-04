@@ -1,6 +1,7 @@
 package com.futilities.mindtimer;
 
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -90,7 +91,12 @@ public class HourGlass {
 
                 db.update(mId, cv);
 
-                // AlarmManager cancels itself
+                // Cancel notification; if it's already cleared this doesn't
+                // error
+                NotificationManager nm = (NotificationManager) mContext
+                        .getSystemService(Context.NOTIFICATION_SERVICE);
+
+                nm.cancel((int) mId);
 
                 break;
 
