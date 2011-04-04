@@ -6,9 +6,11 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 public class HourGlass {
 
@@ -66,6 +68,16 @@ public class HourGlass {
                         + (mSecondsDuration * 1000);
 
                 setAlarm(mContext, mId, mRealtimeDeadline);
+
+                AudioManager am = (AudioManager) mContext
+                        .getSystemService(Context.AUDIO_SERVICE);
+                int currentVolumeIndex = am
+                        .getStreamVolume(AudioManager.STREAM_NOTIFICATION);
+                
+                if(currentVolumeIndex == 0){
+                    Toast.makeText(mContext, "Will vibrate only while volume is muted",
+                            Toast.LENGTH_LONG).show();
+                }
 
                 cv = new ContentValues();
                 cv.put(TimersDbAdapter.KEY_DEADLINE_MILLIS_SINCE_BOOT,
