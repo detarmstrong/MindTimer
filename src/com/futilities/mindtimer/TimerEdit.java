@@ -8,7 +8,11 @@ import java.io.OutputStream;
 import java.util.Random;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -34,6 +38,7 @@ public class TimerEdit extends Activity {
     private static final String TAG = "TimerEdit";
     private static final int CREATE_INTERVAL = 1;
     private static final int TAKE_PICTURE = 2;
+    protected static final int CONFIRM_DELETE_DIALOG = 1;
     private TimersDbAdapter mDb;
     private Long mTimerId;
     private TextView mLabelText;
@@ -54,6 +59,7 @@ public class TimerEdit extends Activity {
     private boolean mIsTempThumbnail = false;
     private boolean mApiSupportsNFC;
     private NfcAdapter mNfcAdapter;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,14 +137,19 @@ public class TimerEdit extends Activity {
 
         });
 
-        Button cancelButton = (Button) findViewById(R.id.CancelEdit);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        Button deleteButton = (Button) findViewById(R.id.DeleteTimer);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                mResultCanceled = true;
-                setResult(RESULT_CANCELED);
-                finish();
+                if (mTimerId != null) {
+                    // prompt for deletion confirmation
+                    showDialog(CONFIRM_DELETE_DIALOG);
+
+                } else {
+                    setResult(RESULT_OK);
+                    finish();
+                }
 
             }
         });
@@ -474,6 +485,37 @@ public class TimerEdit extends Activity {
         outState.putString("thumbnailTempPath", mThumbnailAbsolutePath);
         // outState.putLong(TimersDbAdapter.KEY_ROWID, mTimerId);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        return new AlertDialog.Builder((Context) TimerEdit.this)
+                .setIcon(R.drawable.button_down)
+                .setTitle(R.string.confirm_delete_title)
+                .setNegativeButton(R.string.confirm_delete_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                    int whichButton) {
+
+                                dialog.dismiss();
+                            }
+                        })
+                .setPositiveButton(R.string.confirm_delete_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                    int whichButton) {
+
+                                // stop AlarmManager for timer if it's running
+                                HourGlass.cancelAlarm(TimerEdit.this, mTimerId);
+
+                                // delete timer
+                                mDb.delete(mTimerId);
+
+                                dialog.dismiss();
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+                        }).create();
     }
 
 }

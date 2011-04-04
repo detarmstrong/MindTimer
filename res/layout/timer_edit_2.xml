@@ -53,9 +53,9 @@
         android:background="@drawable/box">
         <Button android:layout_height="wrap_content"
             android:layout_width="0dp" android:layout_weight="1"
-            android:id="@+id/CancelEdit" android:text="Cancel"></Button>
+            android:id="@+id/DeleteTimer" android:text="@string/delete_timer"></Button>
         <Button android:layout_height="wrap_content"
             android:layout_width="0dp" android:layout_weight="1"
-            android:id="@+id/SaveEdit" android:text="Save"></Button>
+            android:id="@+id/SaveEdit" android:text="@string/save_edit"></Button>
     </LinearLayout>
 </LinearLayout>
