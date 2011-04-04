@@ -173,9 +173,6 @@ public class TagTimerActivity extends Activity implements OnClickListener,
             mSaveButton.setOnClickListener(this);
 
             fillData();
-            
-            mDbAdapter.close();
-
         } else {
             Log.e(TAG, "Unknown intent " + intent);
             finish();
@@ -308,8 +305,8 @@ public class TagTimerActivity extends Activity implements OnClickListener,
     }
     
     @Override
-    public void onStop(){
-        super.onStop();
+    public void onDestroy(){
+        super.onDestroy();
         
         mDbAdapter.close();
     }

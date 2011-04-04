@@ -447,6 +447,8 @@ public class TimerEdit extends Activity {
             mDb.update(mTimerId, cv);
         }
 
+        mDb.close();
+
     }
 
     private void getThumbailPicture() {
