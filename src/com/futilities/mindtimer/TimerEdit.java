@@ -66,11 +66,15 @@ public class TimerEdit extends Activity {
         super.onCreate(savedInstanceState);
 
         int currentApiVersion = Build.VERSION.SDK_INT;
-        if (currentApiVersion < android.os.Build.VERSION_CODES.GINGERBREAD) {
-            mApiSupportsNFC = false;
-        } else {
+        if (currentApiVersion == android.os.Build.VERSION_CODES.GINGERBREAD) {
             mApiSupportsNFC = true;
             mNfcAdapter = NfcAdapter.getDefaultAdapter();
+        } else if(currentApiVersion > android.os.Build.VERSION_CODES.GINGERBREAD) {
+            mApiSupportsNFC = true;
+            mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        }
+        else{
+            mApiSupportsNFC = false;
         }
 
         Log.i(TAG, "Api Supports NFC:" + mApiSupportsNFC);
@@ -254,10 +258,15 @@ public class TimerEdit extends Activity {
     }
 
     private void hideMentionOfNfc() {
+        
+        Log.i(TAG, "hiding mention of nfc ");
         findViewById(R.id.nfc_tag_title).setVisibility(View.GONE);
     }
 
     private void showTagInfo(Cursor timer) {
+        
+        Log.i(TAG, "in showTagInfo");
+        
         // If nfc tag is attached, then show the tag_found_layout under
         // edit_timer_nfc_layout
         String nfcTagPayload = timer.getString(timer
