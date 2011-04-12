@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    * Licensed under the Apache License, Version 2.0 (the "License");
+    * you may not use this file except in compliance with the License.
+    * You may obtain a copy of the License at
+    *
+    *      http://www.apache.org/licenses/LICENSE-2.0
+    *
+    * Unless required by applicable law or agreed to in writing, software
+    * distributed under the License is distributed on an "AS IS" BASIS,
+    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    * See the License for the specific language governing permissions and
+    * limitations under the License.
+-->
 <resources>
-
-	<string name="app_name">MindTimer</string>
-	<string name="no_timers">No timers created yet</string>
-	<string name="no_untagged_timers">No untagged timers found</string>
-	<string name="menu_insert">Add new timer</string>
-
-	<string name="one_shot_received">some time is up!</string>
-	<string name="one_shot_scheduled">Scheduled timer</string>
-	<string name="edit_timer">Edit Timer</string>
-	<string name="hour_prompt">Hr:</string>
-	<string name="minute_prompt">Min:</string>
-	<string name="forget_tag">Forget Tag</string>
-	<string name="nfc_tag">NFC Tag</string>
-	<string name="what_is_a_nfc_tag"><u><a href="http://www.youtube.com/watch?v=wk5mUdeEF8c">What is NFC?</a></u></string>
-	<string name="cancel_edit">Cancel</string>
-	<string name="save_edit">Save</string>
-	<string name="delete_timer">Delete</string>
-	<string name="confirm_delete_title">Delete timer?</string>
-	<string name="confirm_delete_ok">Ok</string>
-	<string name="confirm_delete_cancel">Cancel</string>
+    <string name="app_name">MindTimer</string>
+    <string name="no_timers">No timers created yet</string>
+    <string name="no_untagged_timers">No untagged timers found</string>
+    <string name="menu_insert">Add new timer</string>
+    <string name="one_shot_received">some time is up!</string>
+    <string name="one_shot_scheduled">Scheduled timer</string>
+    <string name="edit_timer">Edit Timer</string>
+    <string name="hour_prompt">Hr:</string>
+    <string name="minute_prompt">Min:</string>
+    <string name="forget_tag">Forget Tag</string>
+    <string name="nfc_tag">NFC Tag</string>
+    <string name="what_is_a_nfc_tag">
+        <u>
+            <a href="http://www.youtube.com/watch?v=wk5mUdeEF8c">What is NFC?</a>
+        </u>
+    </string>
+    <string name="cancel_edit">Cancel</string>
+    <string name="save_edit">Save</string>
+    <string name="delete_timer">Delete</string>
+    <string name="confirm_delete_title">Delete timer?</string>
+    <string name="confirm_delete_ok">Ok</string>
+    <string name="confirm_delete_cancel">Cancel</string>
 </resources>
