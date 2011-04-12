@@ -23,7 +23,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class IntervalPicker extends Activity implements OnClickListener {
     private final static String TAG = "numpicker";

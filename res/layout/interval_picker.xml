@@ -46,52 +46,7 @@
             android:layout_width="0dp" android:id="@+id/SelectMinutesButton"
             android:text="Minutes" android:layout_weight="1"></Button>
     </LinearLayout>
-
-
-	<!-- <LinearLayout android:id="@+id/LinearLayout03" android:layout_width="wrap_content" -->
-	<!-- android:layout_height="wrap_content"> -->
-	<!-- <Button android:text="1" android:id="@+id/Button01" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:text="2" android:id="@+id/Button02" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:layout_height="wrap_content" android:layout_width="fill_parent" -->
-	<!-- android:id="@+id/Button03" android:text="3"></Button> -->
-<!---->
-	<!-- </LinearLayout> -->
-<!---->
-<!---->
-	<!-- <LinearLayout android:id="@+id/LinearLayout04" android:layout_width="wrap_content" -->
-	<!-- android:layout_height="wrap_content"> -->
-	<!-- <Button android:text="4" android:id="@+id/Button04" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:text="5" android:id="@+id/Button05" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:layout_height="wrap_content" android:layout_width="fill_parent" -->
-	<!-- android:id="@+id/Button06" android:text="6"></Button> -->
-<!---->
-	<!-- </LinearLayout> -->
-<!---->
-	<!-- <LinearLayout android:id="@+id/LinearLayout05" android:layout_width="wrap_content" -->
-	<!-- android:layout_height="wrap_content"> -->
-	<!-- <Button android:text="7" android:id="@+id/Button07" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:text="8" android:id="@+id/Button08" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:layout_height="wrap_content" android:layout_width="fill_parent" -->
-	<!-- android:id="@+id/Button09" android:text="9"></Button> -->
-<!---->
-	<!-- </LinearLayout> -->
-<!---->
-	<!-- <LinearLayout android:id="@+id/LinearLayout06" android:layout_width="wrap_content" -->
-	<!-- android:layout_height="wrap_content"> -->
-	<!-- <Button android:text="00" android:id="@+id/Button000" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:text="0" android:id="@+id/Button00" android:layout_width="fill_parent" -->
-	<!-- android:layout_height="wrap_content"></Button> -->
-	<!-- <Button android:layout_height="wrap_content" android:layout_width="fill_parent" -->
-	<!-- android:id="@+id/ButtonBackspace" android:text="&lt; Back"></Button> -->
-<!---->
-	<!-- </LinearLayout> -->
+	
     <LinearLayout android:id="@+id/NumPadLayout"
         android:layout_width="wrap_content" android:layout_height="0dp"
         android:layout_weight="4">

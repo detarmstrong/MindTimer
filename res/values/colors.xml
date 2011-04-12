@@ -13,11 +13,11 @@
     * limitations under the License.
 -->
 <resources>
-<color name="picker_background">#000</color>
-<color name="grid_line_hilite">#FFF2FF03</color>
-<color name="tile_selected">#55F2FF03</color>
-<color name="grid_line">#fff</color>
-<color name="foreground">#fff</color>
-<color name="button_selected">#FFF2FF03</color>
-<color name="button_deselected">#999999</color>
+    <color name="picker_background">#000</color>
+    <color name="grid_line_hilite">#FFF2FF03</color>
+    <color name="tile_selected">#55F2FF03</color>
+    <color name="grid_line">#fff</color>
+    <color name="foreground">#fff</color>
+    <color name="button_selected">#FFF2FF03</color>
+    <color name="button_deselected">#999999</color>
 </resources>

@@ -21,8 +21,6 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 public class IntervalPickerNumPadView extends View {
     private static final String TAG = "INTERVALPICKERVIEW";
