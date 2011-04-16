@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
@@ -36,7 +37,7 @@ public class MindTimerList extends ListActivity {
     protected final static int ACTIVITY_EDIT = 0;
     private static final String TAG = "MINDTIMERLIST";
     private static final Long NO_TIMER_TO_START = -1L;
-    private final int INSERT_ID = 1;
+    private final int INSERT_ID = R.id.new_timer;
     private TimersDbAdapter mDbAdapter;
     private MindTimerCursorAdapter mCursorAdapter;
     private Timer mTimer;
@@ -142,8 +143,9 @@ public class MindTimerList extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.mind_timer_list_menu, menu);
+        
         return true;
     }
 
