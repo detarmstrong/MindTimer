@@ -513,7 +513,7 @@ public class TimerEdit extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
         return new AlertDialog.Builder((Context) TimerEdit.this)
-                .setIcon(R.drawable.button_down)
+                .setIcon(R.drawable.ic_menu_trash)
                 .setTitle(R.string.confirm_delete_title)
                 .setNegativeButton(R.string.confirm_delete_cancel,
                         new DialogInterface.OnClickListener() {
