@@ -74,6 +74,7 @@ public class TimerEdit extends Activity {
     private boolean mApiSupportsNFC;
     private NfcAdapter mNfcAdapter;
     private Context mContext;
+    private CharSequence mTempLabelText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,21 +84,15 @@ public class TimerEdit extends Activity {
         if (currentApiVersion == android.os.Build.VERSION_CODES.GINGERBREAD) {
             mApiSupportsNFC = true;
             mNfcAdapter = NfcAdapter.getDefaultAdapter();
-        } else if(currentApiVersion > android.os.Build.VERSION_CODES.GINGERBREAD) {
+        } else if (currentApiVersion > android.os.Build.VERSION_CODES.GINGERBREAD) {
             mApiSupportsNFC = true;
             mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        }
-        else{
+        } else {
             mApiSupportsNFC = false;
         }
 
         Log.i(TAG, "Api Supports NFC:" + mApiSupportsNFC);
         Log.i(TAG, "NFC enabled: " + mNfcAdapter);
-        
-        // Magic (to me) to prevent the softkeyboard from coming up on activity
-        // start
-        this.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         mDb = new TimersDbAdapter(this);
         mDb.open();
@@ -233,6 +228,8 @@ public class TimerEdit extends Activity {
             Cursor timer = mDb.fetchOne(mTimerId);
             startManagingCursor(timer);
 
+            Log.d(TAG, "in populateFields with valid timerId");
+
             mLabelText.setText(timer.getString(timer
                     .getColumnIndexOrThrow(TimersDbAdapter.KEY_LABEL)));
 
@@ -260,7 +257,7 @@ public class TimerEdit extends Activity {
             }
 
             Log.i(TAG, "apisupport" + mApiSupportsNFC);
-            
+
             if (mApiSupportsNFC) {
                 showTagInfo(timer);
             } else {
@@ -272,15 +269,15 @@ public class TimerEdit extends Activity {
     }
 
     private void hideMentionOfNfc() {
-        
+
         Log.i(TAG, "hiding mention of nfc ");
         findViewById(R.id.nfc_tag_title).setVisibility(View.GONE);
     }
 
     private void showTagInfo(Cursor timer) {
-        
+
         Log.i(TAG, "in showTagInfo");
-        
+
         // If nfc tag is attached, then show the tag_found_layout under
         // edit_timer_nfc_layout
         String nfcTagPayload = timer.getString(timer
@@ -357,6 +354,10 @@ public class TimerEdit extends Activity {
 
         Log.v(TAG, "in onPause");
 
+        Log.d(TAG, "label value: " + mLabelText.getText());
+        
+        mTempLabelText = new String( mLabelText.getText().toString() );
+        
         if (!mResultCanceled) {
             // saveState();
         }
@@ -364,16 +365,40 @@ public class TimerEdit extends Activity {
 
     @Override
     protected void onResume() {
+        
+        Log.d(TAG, "in onResume before call to super");
+        Log.d(TAG, "label value: " + mLabelText.getText());
+        
         super.onResume();
+        
+        Log.d(TAG, "in onResume after call to super");
+        Log.d(TAG, "label value: " + mLabelText.getText());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore UI state from the savedInstanceState.
+        // This bundle has also been passed to onCreate.
+        
+        Log.d(TAG, "in onRestoreInstanceState");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("timeredit", "in onActivityResult");
-
+        Log.i(TAG, "in onActivityResult");
+        
+        Log.i(TAG, "label value from getText(): " + mLabelText.getText());
+        Log.i(TAG, "label value from temp var: " + mTempLabelText);
+        
         switch (requestCode) {
             case TAKE_PICTURE:
+                // Interesting bug necessitating this line: If new timer, type label, hit back button to hide keyboard
+                // now take picture, on returning the text typed before hitting back is doubled
+                // Workaround is to save a copy myself and set it
+                mLabelText.setText(mTempLabelText);
+                
                 // Check if the result includes a thumbnail Bitmap
                 if (data != null) {
                     if (data.hasExtra("data")) {
@@ -450,6 +475,8 @@ public class TimerEdit extends Activity {
     }
 
     private void saveState() {
+        Log.d(TAG, "in saveState()");
+
         String label = mLabelText.getText().toString();
 
         int hourLabel = Integer.parseInt(mHourPart);
@@ -493,7 +520,7 @@ public class TimerEdit extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            mResultCanceled = true;
+            //mResultCanceled = true;
         }
 
         return super.onKeyDown(keyCode, event);
@@ -501,12 +528,11 @@ public class TimerEdit extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // TODO Auto-generated method stub
+        Log.d(TAG, "in onSaveInstanceState");
         outState.putString("intervalText", (String) mIntervalText.getText());
         outState.putString("hourPart", mHourPart);
         outState.putString("minutePart", mMinutePart);
         outState.putString("thumbnailTempPath", mThumbnailAbsolutePath);
-        // outState.putLong(TimersDbAdapter.KEY_ROWID, mTimerId);
         super.onSaveInstanceState(outState);
     }
 

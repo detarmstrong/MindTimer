@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="TimerEdit"></activity>
+        <activity android:name="TimerEdit" android:windowSoftInputMode="stateUnchanged"></activity>
 
         <activity android:name="IntervalPicker" android:label="Set Duration"
             android:screenOrientation="portrait">
