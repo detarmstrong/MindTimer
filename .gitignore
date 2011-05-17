@@ -1,4 +1,4 @@
 /bin
 .DS_Store
-.settings/org.eclipse.wst.validation.prefs
+.settings
 gen/com/futilities/mindtimer/R.java
