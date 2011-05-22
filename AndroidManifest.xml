@@ -1,65 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
-    * Licensed under the Apache License, Version 2.0 (the "License");
-    * you may not use this file except in compliance with the License.
-    * You may obtain a copy of the License at
-    *
-    *      http://www.apache.org/licenses/LICENSE-2.0
-    *
-    * Unless required by applicable law or agreed to in writing, software
-    * distributed under the License is distributed on an "AS IS" BASIS,
-    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    * See the License for the specific language governing permissions and
-    * limitations under the License.
--->
-<manifest package="com.futilities.mindtimer"
-    android:versionCode="2" android:versionName="1.1"
-    android:installLocation="internalOnly" xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.nfc"
-        android:required="false" />
-    <uses-feature android:name="android.hardware.camera"
-        android:required="true" />
-    <supports-screens android:anyDensity="true"></supports-screens>
-    <uses-sdk android:targetSdkVersion="9"
-        android:minSdkVersion="7"></uses-sdk>
+<!-- * Licensed under the Apache License, Version 2.0 (the "License"); * you may not use this 
+	file except in compliance with the License. * You may obtain a copy of the License at * * http://www.apache.org/licenses/LICENSE-2.0 
+	* * Unless required by applicable law or agreed to in writing, software * distributed under 
+	the License is distributed on an "AS IS" BASIS, * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+	either express or implied. * See the License for the specific language governing permissions 
+	and * limitations under the License. -->
+<manifest package="com.futilities.mindtimer" android:versionCode="2"
+	android:versionName="1.1" android:installLocation="internalOnly"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<uses-permission android:name="android.permission.NFC" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-feature android:name="android.hardware.nfc" android:required="false" />
+	<uses-feature android:name="android.hardware.camera" android:required="true" />
+	<supports-screens android:anyDensity="true"></supports-screens>
+	<uses-sdk android:targetSdkVersion="9" android:minSdkVersion="7"></uses-sdk>
 
 	<!-- Must install internalOnly because AlarmManagers are killed when files system mounted 
 		on usb http://developer.android.com/guide/appendix/install-location.html#ShouldNot -->
-    <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
 
-    <application android:label="@string/app_name"
-        android:debuggable="false" android:icon="@drawable/ic_launcher">
-        <service android:process=":remote" android:name="MindTimerService" />
-        <receiver android:process=":remote" android:name="MindTimerAlarmReceiver" />
-        <activity android:name=".MindTimerList" android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+	<application android:label="@string/app_name" android:debuggable="false"
+		android:icon="@drawable/ic_launcher">
+		<service android:process=":remote" android:name="MindTimerService" />
+		<receiver android:process=":remote" android:name="MindTimerAlarmReceiver" />
+		<activity android:name=".MindTimerList" android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
 				<!-- <action android:name="android.nfc.action.TAG_DISCOVERED"></action> -->
 				<!-- <category android:name="android.intent.category.DEFAULT"></category> -->
-            </intent-filter>
-        </activity>
+			</intent-filter>
+		</activity>
 
-        <activity android:name="TimerEdit"></activity>
+		<activity android:name="TimerEdit"></activity>
 
-        <activity android:name="IntervalPicker" android:label="Set Duration"
-            android:screenOrientation="portrait">
-            <intent-filter>
+		<activity android:name="IntervalPicker" android:label="Set Duration"
+			android:screenOrientation="portrait">
+			<intent-filter>
 				<!-- <action android:name="android.intent.action.MAIN"></action> -->
 				<!-- <category android:name="android.intent.category.LAUNCHER"></category> -->
-            </intent-filter>
-        </activity>
-        
-        <!--TODO determine why adding this causes database error: android:finishOnTaskLaunch="true" -->
-        <activity android:screenOrientation="portrait"
-            android:launchMode="standard" android:name="TagTimerActivity">
-            <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <receiver android:name="NotificationReceiver"></receiver>
-    </application>
+			</intent-filter>
+		</activity>
+
+		<!--TODO determine why adding this causes database error: android:finishOnTaskLaunch="true" -->
+		<activity android:name="TagTimerActivity" android:screenOrientation="portrait"
+			android:launchMode="standard">
+			<intent-filter>
+				<action android:name="android.nfc.action.TAG_DISCOVERED" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+
+			<intent-filter>
+				<action android:name="android.nfc.action.TECH_DISCOVERED" />
+			</intent-filter>
+
+			<meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+				android:resource="@xml/filter_nfc" />
+		</activity>
+		<receiver android:name="NotificationReceiver"></receiver>
+	</application>
 </manifest> 

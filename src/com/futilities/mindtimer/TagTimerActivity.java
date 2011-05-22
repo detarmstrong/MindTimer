@@ -62,7 +62,7 @@ public class TagTimerActivity extends Activity implements OnClickListener,
 
         Intent intent = getIntent();
         String action = intent.getAction();
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action) || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
             Parcelable[] rawMsgs = intent
                     .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             NdefMessage[] msgs;
@@ -322,7 +322,10 @@ public class TagTimerActivity extends Activity implements OnClickListener,
     public void onDestroy(){
         super.onDestroy();
         
-        mDbAdapter.close();
+        if(mDbAdapter != null){
+            mDbAdapter.close();
+            
+        }
     }
 
 }
